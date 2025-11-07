@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  FRONTEND_SERVICE_HTTP_DIAL_ADDR: frontend-service.blueprint-hotel-reservation:12345
+  JAEGER_DIAL_ADDR: jaeger.blueprint-hotel-reservation:12348
+  OUTFILE: stats.csv
+  DURATION: 120s
+  TPUT: '3000'
+  MULTIPLIER: '6'
+  STABLETIME: '60'
+  TRIGGERTIME: '30'
+  REVERTTIME: '30'
+
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: bhotelwrk-wlgen-env
+  name: bhotelwrk-wlgen-env

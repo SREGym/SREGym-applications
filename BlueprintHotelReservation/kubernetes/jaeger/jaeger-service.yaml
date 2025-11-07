@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel convert
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: jaeger
+  name: jaeger
+
+spec:
+  type: NodePort
+  ports:
+    - name: "12348"
+      port: 12348
+      targetPort: 14268
+    - name: "12349"
+      port: 12349
+      targetPort: 16686
+    - name: "14268"
+      port: 14268
+      targetPort: 14268
+    - name: "16686"
+      port: 16686
+      targetPort: 16686
+  selector:
+    io.kompose.service: jaeger

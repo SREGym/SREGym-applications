@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  JAEGER_DIAL_ADDR: jaeger:14268
+  RECOMD_DB_DIAL_ADDR: recomd-db:27017
+  RECOMD_SERVICE_GRPC_BIND_ADDR: 0.0.0.0:12345
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: recomd-service-container-recomd-service-container-env
+  name: recomd-service-container-env

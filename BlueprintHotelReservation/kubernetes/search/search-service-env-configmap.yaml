@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  GEO_SERVICE_GRPC_DIAL_ADDR: geo-service:12345
+  JAEGER_DIAL_ADDR: jaeger:14268
+  RATE_SERVICE_GRPC_DIAL_ADDR: rate-service:12345
+  SEARCH_SERVICE_GRPC_BIND_ADDR: 0.0.0.0:12345
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: search-service-container-search-service-container-env
+  name: search-service-container-env

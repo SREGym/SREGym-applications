@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel convert
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: reserv-cache
+  name: reserv-cache
+
+spec:
+  ports:
+    - name: "12358"
+      port: 12358
+      targetPort: 11211
+    - name: "11211"
+      port: 11211
+      targetPort: 11211
+  selector:
+    io.kompose.service: reserv-cache

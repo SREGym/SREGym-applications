@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel
+      convert
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    configmap: rpc
+    io.kompose.service: frontend-service
+  name: frontend-service
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: frontend-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel
+          convert
+        kompose.image-pull-policy: IfNotPresent
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        io.kompose.service: frontend-service
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: frontend-service-container-env
+        - configMapRef:
+            name: rpc
+        image: 777lefty/docker-frontend-service-container:latest
+        imagePullPolicy: IfNotPresent
+        name: frontend-service-container
+        ports:
+        - containerPort: 2000
+          protocol: TCP
+      hostname: frontend-service
+      restartPolicy: Always

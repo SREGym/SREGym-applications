@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel
+      convert
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: profile-cache
+  name: profile-cache
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: profile-cache
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel
+          convert
+        kompose.image-pull-policy: IfNotPresent
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        io.kompose.service: profile-cache
+    spec:
+      containers:
+      - image: memcached
+        imagePullPolicy: IfNotPresent
+        name: profile-cache-ctr
+        ports:
+        - containerPort: 11211
+          protocol: TCP
+      hostname: profile-cache
+      restartPolicy: Always

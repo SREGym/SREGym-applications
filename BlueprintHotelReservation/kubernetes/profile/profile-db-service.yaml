@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel convert
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: profile-db
+  name: profile-db
+
+spec:
+  ports:
+    - name: "12351"
+      port: 12351
+      targetPort: 27017
+    - name: "27017"
+      port: 27017
+      targetPort: 27017
+  selector:
+    io.kompose.service: profile-db

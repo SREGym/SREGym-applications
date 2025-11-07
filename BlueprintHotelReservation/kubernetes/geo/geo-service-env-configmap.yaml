@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  GEO_DB_DIAL_ADDR: geo-db:27017
+  GEO_SERVICE_GRPC_BIND_ADDR: 0.0.0.0:12345
+  JAEGER_DIAL_ADDR: jaeger:14268
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: geo-service-container-geo-service-container-env
+  name: geo-service-container-env

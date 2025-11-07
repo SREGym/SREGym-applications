@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bhotelwrk-wlgen-job
+  labels:
+    job: workload
+spec:
+  backoffLimit: 0   
+  template:
+    metadata:
+      labels:
+          job-name: bhotelwrk-wlgen-job
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: wlgen
+        image: 777lefty/wlgen-proc:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: bhotelwrk-wlgen-env
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "🚀 Running wlgen_proc with FRONTEND_SERVICE_HTTP_DIAL_ADDR=$FRONTEND_SERVICE_HTTP_DIAL_ADDR and JAEGER_DIAL_ADDR=$JAEGER_DIAL_ADDR"
+            /app/wlgen_proc --outfile $OUTFILE --duration $DURATION --tput $TPUT --multiplier $MULTIPLIER --stabletime $STABLETIME --triggertime $TRIGGERTIME --reverttime $REVERTTIME

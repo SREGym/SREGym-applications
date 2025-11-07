@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  FRONTEND_SERVICE_HTTP_BIND_ADDR: 0.0.0.0:2000
+  JAEGER_DIAL_ADDR: jaeger:14268
+  PROFILE_SERVICE_GRPC_DIAL_ADDR: profile-service:12345
+  RECOMD_SERVICE_GRPC_DIAL_ADDR: recomd-service:12345
+  RESERV_SERVICE_GRPC_DIAL_ADDR: reserv-service:12345
+  SEARCH_SERVICE_GRPC_DIAL_ADDR: search-service:12345
+  USER_SERVICE_GRPC_DIAL_ADDR: user-service:12345
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: frontend-service-container-frontend-service-container-env
+  name: frontend-service-container-env

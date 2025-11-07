@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel
+      convert
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    configmap: rpc
+    io.kompose.service: search-service
+  name: search-service
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: search-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel
+          convert
+        kompose.image-pull-policy: IfNotPresent
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        io.kompose.service: search-service
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: search-service-container-env
+        - configMapRef:
+            name: rpc
+        image: 777lefty/docker-search-service-container:latest
+        imagePullPolicy: IfNotPresent
+        name: search-service-container
+        ports:
+        - containerPort: 12345
+          protocol: TCP
+      hostname: search-service
+      restartPolicy: Always

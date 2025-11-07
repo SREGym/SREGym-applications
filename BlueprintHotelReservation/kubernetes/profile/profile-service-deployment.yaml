@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel
+      convert
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    configmap: rpc
+    io.kompose.service: profile-service
+  name: profile-service
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: profile-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel
+          convert
+        kompose.image-pull-policy: IfNotPresent
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        io.kompose.service: profile-service
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: profile-service-container-env
+        - configMapRef:
+            name: rpc
+        image: 777lefty/docker-profile-service-container:latest
+        imagePullPolicy: IfNotPresent
+        name: profile-service-container
+        ports:
+        - containerPort: 12345
+          protocol: TCP
+      hostname: profile-service
+      restartPolicy: Always

@@ -1,0 +1,12 @@
+[submodule "train-ticket"]
+	path = train-ticket
+	url = https://github.com/xlab-uiuc/train-ticket
+[submodule "flight-ticket"]
+	path = flight-ticket
+	url = https://github.com/xlab-uiuc/flight-ticket
+[submodule "astronomy-shop"]
+	path = astronomy-shop
+	url = https://github.com/xlab-uiuc/opentelemetry-helm-charts
+[submodule "FleetCast"]
+	path = FleetCast
+	url = https://github.com/lilygn/FleetCast

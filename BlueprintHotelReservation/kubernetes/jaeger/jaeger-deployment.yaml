@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel
+      convert
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: jaeger
+  name: jaeger
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: jaeger
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f docker-compose-no-rpc.yml -o k8s-no-rpc/ -n blueprint-hotel
+          convert
+        kompose.image-pull-policy: IfNotPresent
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        io.kompose.service: jaeger
+    spec:
+      containers:
+      - image: jaegertracing/all-in-one:latest
+        imagePullPolicy: IfNotPresent
+        name: jaeger-ctr
+        ports:
+        - containerPort: 14268
+          protocol: TCP
+        - containerPort: 16686
+          protocol: TCP
+      hostname: jaeger
+      restartPolicy: Always

@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  GRPC_CLIENT_RETRIES_ON_ERROR: '1'
+  GRPC_CLIENT_TIMEOUT: 1s
+kind: ConfigMap
+metadata:
+  labels:
+    app: hotel-services
+    component: rpc-config
+  name: rpc

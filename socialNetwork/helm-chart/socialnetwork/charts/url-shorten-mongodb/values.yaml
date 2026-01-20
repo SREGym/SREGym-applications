@@ -9,23 +9,14 @@ ports:
     targetPort: 27017
 
 container:
-  args: 
+  args:
   - --config
   - /social-network-microservices/config/mongod.conf
   image: library/mongo
   imageVersion: 4.4.6
   name: url-shorten-mongodb
-  ports: 
+  ports:
   - containerPort: 27017
-  volumeMounts:
-  - name: tls-cert
-    mountPath: /etc/tls
-    readOnly: true
-
-volumes:
-  - name: tls-cert
-    secret:
-      secretName: mongodb-tls
 
 configMaps:
   - name: mongod.conf

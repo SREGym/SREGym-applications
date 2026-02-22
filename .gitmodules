@@ -9,4 +9,4 @@
 	url = https://github.com/xlab-uiuc/opentelemetry-helm-charts
 [submodule "FleetCast"]
 	path = FleetCast
-	url = https://github.com/lilygn/FleetCast
+	url = https://github.com/yimingsu01/FleetCast

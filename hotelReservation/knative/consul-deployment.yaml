@@ -26,7 +26,7 @@ spec:
         io.kompose.service: consul
     spec:
       containers:
-        - image: hashicorp/consul:latest
+        - image: hashicorp/consul:1.22.3
           name: consul
           ports:
             - containerPort: 8300

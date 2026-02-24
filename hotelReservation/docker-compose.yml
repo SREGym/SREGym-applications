@@ -1,7 +1,7 @@
 version: "2"
 services:
   consul:
-    image: hashicorp/consul:latest
+    image: hashicorp/consul:1.22.3
     ports:
       - "8300:8300"
       - "8400:8400"
@@ -193,7 +193,7 @@ services:
     # hostname: geo-db
     restart: always
     volumes:
-      - geo:/data/db  
+      - geo:/data/db
 
   mongodb-profile:
     image: mongo:4.4.6
@@ -201,7 +201,7 @@ services:
     hostname: profile-db
     restart: always
     volumes:
-      - profile:/data/db    
+      - profile:/data/db
 
   mongodb-rate:
     image: mongo:4.4.6
@@ -209,7 +209,7 @@ services:
     hostname: rate-db
     restart: always
     volumes:
-      - rate:/data/db   
+      - rate:/data/db
 
   mongodb-recommendation:
     image: mongo:4.4.6
@@ -218,14 +218,14 @@ services:
     restart: always
     volumes:
       - recommendation:/data/db
-    
+
   mongodb-reservation:
     image: mongo:4.4.6
     container_name: 'hotel_reserv_reservation_mongo'
     hostname: reservation-db
     restart: always
     volumes:
-      - reservation:/data/db 
+      - reservation:/data/db
 
   mongodb-user:
     image: mongo:4.4.6
@@ -234,7 +234,7 @@ services:
     restart: always
     volumes:
       - user:/data/db
-    
+
 volumes:
   geo:
   profile:

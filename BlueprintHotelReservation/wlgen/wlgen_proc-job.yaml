@@ -10,6 +10,7 @@ spec:
     metadata:
       labels:
           job-name: bhotelwrk-wlgen-job
+          job: workload
     spec:
       restartPolicy: Never
       containers:

@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
   FRONTEND_SERVICE_HTTP_DIAL_ADDR: frontend-service.blueprint-hotel-reservation:12345
-  JAEGER_DIAL_ADDR: jaeger.blueprint-hotel-reservation:12348
+  JAEGER_DIAL_ADDR: otel-collector.observe:14268
   OUTFILE: stats.csv
   DURATION: 120s
   TPUT: '3000'

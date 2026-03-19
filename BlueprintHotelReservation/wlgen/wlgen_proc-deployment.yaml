@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bhotelwrk-wlgen
+  namespace: blueprint-hotel-reservation
+  labels:
+    job: workload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      job: workload
+  template:
+    metadata:
+      labels:
+        job: workload
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: wlgen
+        image: 777lefty/wlgen-proc:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: bhotelwrk-wlgen-env
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            while true; do
+              echo "🚀 Running wlgen_proc with FRONTEND_SERVICE_HTTP_DIAL_ADDR=$FRONTEND_SERVICE_HTTP_DIAL_ADDR and JAEGER_DIAL_ADDR=$JAEGER_DIAL_ADDR"
+              /app/wlgen_proc --outfile $OUTFILE --duration $DURATION --tput $TPUT --multiplier $MULTIPLIER --stabletime $STABLETIME --triggertime $TRIGGERTIME --reverttime $REVERTTIME
+            done

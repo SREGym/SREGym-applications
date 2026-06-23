@@ -46,8 +46,6 @@ spec:
               name: rate
             - mountPath: /docker-entrypoint-initdb.d
               name: init-script
-            - mountPath: /scripts
-              name: failure-script 
           imagePullPolicy: IfNotPresent
       volumes:
         - name: rate
@@ -56,8 +54,5 @@ spec:
         - name: init-script
           configMap:
             name: mongo-rate-script
-        - name: failure-script
-          configMap:
-            name: failure-admin-rate
 
 status: {}

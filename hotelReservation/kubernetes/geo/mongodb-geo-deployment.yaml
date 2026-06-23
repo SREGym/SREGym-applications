@@ -46,18 +46,13 @@ spec:
               name: geo
             - mountPath: /docker-entrypoint-initdb.d
               name: init-script
-            - mountPath: /scripts
-              name: failure-script
           imagePullPolicy: IfNotPresent
       restartPolicy: Always
       volumes:
         - name: geo
           persistentVolumeClaim:
-            claimName: geo-pvc  
+            claimName: geo-pvc
         - name: init-script
           configMap:
             name: mongo-geo-script
-        - name: failure-script
-          configMap:
-            name: failure-admin-geo
 status: {}

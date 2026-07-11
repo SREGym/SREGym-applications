@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 
 	"google.golang.org/grpc"
@@ -154,6 +155,11 @@ func (s *Server) getGprcConn(name string) (*grpc.ClientConn, error) {
 func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	ctx := r.Context()
+	if os.Getenv("SEARCH_BACKEND_VERSION") == "true" {
+    log.Error().Msg("SearchHandler GetHotels failed: upstream service unavailable")
+    http.Error(w, "internal server error", http.StatusInternalServerError)
+    return
+}
 
 	log.Trace().Msg("starts searchHandler")
 

@@ -13,6 +13,9 @@ spec:
     - name: "8084"
       port: 8084
       targetPort: 8084
+    - name: metrics
+      port: 9091
+      targetPort: 9091
   selector:
     io.kompose.service: rate
 status:

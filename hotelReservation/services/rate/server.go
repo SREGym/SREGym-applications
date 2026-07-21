@@ -9,10 +9,14 @@ import (
 
 	// "io/ioutil"
 	"net"
+	"net/http"
+	"os"
 	// "os"
 	"sort"
-	"time"
+	"strconv"
 	"sync"
+	"sync/atomic"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -24,7 +28,9 @@ import (
 	"github.com/opentracing/opentracing-go"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/keepalive"
+	"google.golang.org/grpc/status"
 
 	"strings"
 
@@ -32,6 +38,19 @@ import (
 )
 
 const name = "srv-rate"
+
+type requestPacer struct {
+	tokens        chan struct{}
+	queueSlots    chan struct{}
+	queueDepth    int64
+	inFlight      int64
+	received      uint64
+	completed     uint64
+	expired       uint64
+	rejected      uint64
+	qpsLimit      int
+	queueCapacity int
+}
 
 // Server implements the rate service
 type Server struct {
@@ -42,6 +61,53 @@ type Server struct {
 	Registry     *registry.Client
 	MemcClient   *memcache.Client
 	uuid         string
+	pacer        *requestPacer
+}
+
+func envPositiveInt(name string, fallback int) int {
+	value, err := strconv.Atoi(os.Getenv(name))
+	if err != nil || value <= 0 {
+		return fallback
+	}
+	return value
+}
+
+func newRequestPacer(qpsLimit, queueCapacity int) *requestPacer {
+	p := &requestPacer{
+		tokens:        make(chan struct{}, 1),
+		queueSlots:    make(chan struct{}, queueCapacity),
+		qpsLimit:      qpsLimit,
+		queueCapacity: queueCapacity,
+	}
+	p.tokens <- struct{}{}
+	interval := time.Second / time.Duration(qpsLimit)
+	go func() {
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+		for range ticker.C {
+			select {
+			case p.tokens <- struct{}{}:
+			default:
+			}
+		}
+	}()
+	return p
+}
+
+func (p *requestPacer) waitForCapacity() error {
+	select {
+	case p.queueSlots <- struct{}{}:
+		atomic.AddInt64(&p.queueDepth, 1)
+	default:
+		atomic.AddUint64(&p.rejected, 1)
+		return fmt.Errorf("rate request queue is full")
+	}
+
+	<-p.tokens
+	<-p.queueSlots
+	atomic.AddInt64(&p.queueDepth, -1)
+	atomic.AddInt64(&p.inFlight, 1)
+	return nil
 }
 
 // Run starts the server
@@ -53,6 +119,9 @@ func (s *Server) Run() error {
 	}
 
 	s.uuid = uuid.New().String()
+	qpsLimit := envPositiveInt("RATE_BACKEND_QPS_LIMIT", 20)
+	s.pacer = newRequestPacer(qpsLimit, envPositiveInt("RATE_QUEUE_CAPACITY", 256))
+	go s.serveMetrics()
 
 	opts := []grpc.ServerOption{
 		grpc.KeepaliveParams(keepalive.ServerParameters{
@@ -101,6 +170,25 @@ func (s *Server) Run() error {
 	return srv.Serve(lis)
 }
 
+func (s *Server) serveMetrics() {
+	port := envPositiveInt("RATE_METRICS_PORT", 9091)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/metrics", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; version=0.0.4")
+		fmt.Fprintf(w, "rate_backend_qps_limit %d\n", s.pacer.qpsLimit)
+		fmt.Fprintf(w, "rate_queue_capacity %d\n", s.pacer.queueCapacity)
+		fmt.Fprintf(w, "rate_queue_depth %d\n", atomic.LoadInt64(&s.pacer.queueDepth))
+		fmt.Fprintf(w, "rate_in_flight %d\n", atomic.LoadInt64(&s.pacer.inFlight))
+		fmt.Fprintf(w, "rate_requests_received_total %d\n", atomic.LoadUint64(&s.pacer.received))
+		fmt.Fprintf(w, "rate_requests_completed_total %d\n", atomic.LoadUint64(&s.pacer.completed))
+		fmt.Fprintf(w, "rate_requests_expired_total %d\n", atomic.LoadUint64(&s.pacer.expired))
+		fmt.Fprintf(w, "rate_requests_rejected_total %d\n", atomic.LoadUint64(&s.pacer.rejected))
+	})
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), mux); err != nil {
+		log.Error().Err(err).Msg("rate metrics server stopped")
+	}
+}
+
 // Shutdown cleans up any processes
 func (s *Server) Shutdown() {
 	s.Registry.Deregister(s.uuid)
@@ -108,6 +196,19 @@ func (s *Server) Shutdown() {
 
 // GetRates gets rates for hotels for specific date range.
 func (s *Server) GetRates(ctx context.Context, req *pb.Request) (*pb.Result, error) {
+	if s.pacer != nil {
+		atomic.AddUint64(&s.pacer.received, 1)
+		if err := s.pacer.waitForCapacity(); err != nil {
+			return nil, status.Error(codes.ResourceExhausted, err.Error())
+		}
+		defer func() {
+			atomic.AddInt64(&s.pacer.inFlight, -1)
+			atomic.AddUint64(&s.pacer.completed, 1)
+			if ctx.Err() != nil {
+				atomic.AddUint64(&s.pacer.expired, 1)
+			}
+		}()
+	}
 	res := new(pb.Result)
 	// session, err := mgo.Dial("mongodb-rate")
 	// if err != nil {

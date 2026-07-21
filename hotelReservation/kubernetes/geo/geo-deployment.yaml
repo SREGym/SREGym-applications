@@ -28,7 +28,7 @@ spec:
       containers:
         - command:
             - geo
-          image: yinfangchen/hotelreservation:latest
+          image: ghcr.io/sregym/hotel-reservation:latest
           name: hotel-reserv-geo
           ports:
             - containerPort: 8083

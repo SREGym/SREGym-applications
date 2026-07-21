@@ -28,13 +28,25 @@ spec:
       containers:
         - command:
             - search
-          image: yinfangchen/hotelreservation:latest
+          image: ghcr.io/sregym/hotel-reservation:latest
           name: hotel-reserv-search
           ports:
             - containerPort: 8082
+            - containerPort: 9092
+              name: metrics
           env:
             - name: JAEGER_SAMPLE_RATIO
               value: "1"
+            - name: RATE_RPC_TIMEOUT_MS
+              value: "1000"
+            - name: RATE_RPC_MAX_ATTEMPTS
+              value: "2"
+            - name: RATE_RPC_INITIAL_BACKOFF_MS
+              value: "100"
+            - name: RATE_RPC_BACKOFF_MULTIPLIER
+              value: "2.0"
+            - name: RATE_RPC_JITTER
+              value: "0.2"
           resources:
             requests:
               cpu: 100m

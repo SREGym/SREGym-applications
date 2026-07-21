@@ -13,6 +13,9 @@ spec:
     - name: "8082"
       port: 8082
       targetPort: 8082 # 8082
+    - name: metrics
+      port: 9092
+      targetPort: 9092
   selector:
     io.kompose.service: search
 status:

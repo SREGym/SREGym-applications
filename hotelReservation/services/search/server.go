@@ -3,8 +3,14 @@ package search
 import (
 	// "encoding/json"
 	"fmt"
+	"math"
+	"math/rand"
 	// F"io/ioutil"
 	"net"
+	"net/http"
+	"os"
+	"strconv"
+	"sync/atomic"
 
 	"github.com/rs/zerolog/log"
 
@@ -22,22 +28,79 @@ import (
 	opentracing "github.com/opentracing/opentracing-go"
 	context "golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/keepalive"
+	"google.golang.org/grpc/status"
 )
 
 const name = "srv-search"
+
+type rateRetryPolicy struct {
+	timeout           time.Duration
+	maxAttempts       int
+	initialBackoff    time.Duration
+	backoffMultiplier float64
+	jitterFraction    float64
+}
+
+type searchMetrics struct {
+	requestsTotal      uint64
+	rateAttemptsTotal  uint64
+	rateTimeoutsTotal  uint64
+	rateFailuresTotal  uint64
+	rateSuccessesTotal uint64
+}
 
 // Server implments the search service
 type Server struct {
 	geoClient  geo.GeoClient
 	rateClient rate.RateClient
 
-	Tracer     opentracing.Tracer
-	Port       int
-	IpAddr     string
-	KnativeDns string
-	Registry   *registry.Client
-	uuid       string
+	Tracer      opentracing.Tracer
+	Port        int
+	IpAddr      string
+	KnativeDns  string
+	Registry    *registry.Client
+	uuid        string
+	retryPolicy rateRetryPolicy
+	metrics     searchMetrics
+}
+
+func envInt(name string, fallback int) int {
+	value, err := strconv.Atoi(os.Getenv(name))
+	if err != nil || value <= 0 {
+		return fallback
+	}
+	return value
+}
+
+func envFloat(name string, fallback float64) float64 {
+	value, err := strconv.ParseFloat(os.Getenv(name), 64)
+	if err != nil || value < 0 {
+		return fallback
+	}
+	return value
+}
+
+func loadRateRetryPolicy() rateRetryPolicy {
+	return rateRetryPolicy{
+		timeout:           time.Duration(envInt("RATE_RPC_TIMEOUT_MS", 750)) * time.Millisecond,
+		maxAttempts:       envInt("RATE_RPC_MAX_ATTEMPTS", 3),
+		initialBackoff:    time.Duration(envInt("RATE_RPC_INITIAL_BACKOFF_MS", 50)) * time.Millisecond,
+		backoffMultiplier: envFloat("RATE_RPC_BACKOFF_MULTIPLIER", 2.0),
+		jitterFraction:    envFloat("RATE_RPC_JITTER", 0.2),
+	}
+}
+
+func (p rateRetryPolicy) backoff(attempt int) time.Duration {
+	delay := float64(p.initialBackoff) * math.Pow(p.backoffMultiplier, float64(attempt-1))
+	if p.jitterFraction > 0 {
+		delay *= 1 + ((rand.Float64()*2)-1)*p.jitterFraction
+	}
+	if delay < 0 {
+		return 0
+	}
+	return time.Duration(delay)
 }
 
 // Run starts the server
@@ -47,6 +110,8 @@ func (s *Server) Run() error {
 	}
 
 	s.uuid = uuid.New().String()
+	s.retryPolicy = loadRateRetryPolicy()
+	go s.serveMetrics()
 
 	opts := []grpc.ServerOption{
 		grpc.KeepaliveParams(keepalive.ServerParameters{
@@ -102,6 +167,22 @@ func (s *Server) Run() error {
 	return srv.Serve(lis)
 }
 
+func (s *Server) serveMetrics() {
+	port := envInt("SEARCH_METRICS_PORT", 9092)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/metrics", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; version=0.0.4")
+		fmt.Fprintf(w, "search_requests_total %d\n", atomic.LoadUint64(&s.metrics.requestsTotal))
+		fmt.Fprintf(w, "search_rate_attempts_total %d\n", atomic.LoadUint64(&s.metrics.rateAttemptsTotal))
+		fmt.Fprintf(w, "search_rate_timeouts_total %d\n", atomic.LoadUint64(&s.metrics.rateTimeoutsTotal))
+		fmt.Fprintf(w, "search_rate_failures_total %d\n", atomic.LoadUint64(&s.metrics.rateFailuresTotal))
+		fmt.Fprintf(w, "search_rate_successes_total %d\n", atomic.LoadUint64(&s.metrics.rateSuccessesTotal))
+	})
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), mux); err != nil {
+		log.Error().Err(err).Msg("search metrics server stopped")
+	}
+}
+
 // Shutdown cleans up any processes
 func (s *Server) Shutdown() {
 	s.Registry.Deregister(s.uuid)
@@ -141,6 +222,7 @@ func (s *Server) getGprcConn(name string) (*grpc.ClientConn, error) {
 
 // Nearby returns ids of nearby hotels ordered by ranking algo
 func (s *Server) Nearby(ctx context.Context, req *pb.NearbyRequest) (*pb.SearchResult, error) {
+	atomic.AddUint64(&s.metrics.requestsTotal, 1)
 	// find nearby hotels
 	log.Trace().Msg("in Search Nearby")
 
@@ -159,14 +241,16 @@ func (s *Server) Nearby(ctx context.Context, req *pb.NearbyRequest) (*pb.SearchR
 		log.Trace().Msgf("get Nearby hotelId = %s", hid)
 	}
 
-	// find rates for hotels
-	rates, err := s.rateClient.GetRates(ctx, &rate.Request{
+	// Find rates for hotels. Each attempt has its own deadline so a transient
+	// downstream slowdown cannot occupy this service indefinitely.
+	rates, err := s.getRates(ctx, &rate.Request{
 		HotelIds: nearby.HotelIds,
 		InDate:   req.InDate,
 		OutDate:  req.OutDate,
 	})
 	if err != nil {
-		return nil, err
+		log.Warn().Str("dependency", "rate").Str("grpc_code", grpc.Code(err).String()).Msg("downstream request failed")
+		return nil, status.Error(codes.Unavailable, "search dependency unavailable")
 	}
 
 	// TODO(hw): add simple ranking algo to order hotel ids:
@@ -181,4 +265,38 @@ func (s *Server) Nearby(ctx context.Context, req *pb.NearbyRequest) (*pb.SearchR
 		res.HotelIds = append(res.HotelIds, ratePlan.HotelId)
 	}
 	return res, nil
+}
+
+func (s *Server) getRates(ctx context.Context, req *rate.Request) (*rate.Result, error) {
+	policy := s.retryPolicy
+	var lastErr error
+
+	for attempt := 1; attempt <= policy.maxAttempts; attempt++ {
+		attemptCtx, cancel := context.WithTimeout(ctx, policy.timeout)
+		atomic.AddUint64(&s.metrics.rateAttemptsTotal, 1)
+		result, err := s.rateClient.GetRates(attemptCtx, req)
+		deadlineExceeded := attemptCtx.Err() == context.DeadlineExceeded || grpc.Code(err) == codes.DeadlineExceeded
+		cancel()
+
+		if err == nil {
+			atomic.AddUint64(&s.metrics.rateSuccessesTotal, 1)
+			return result, nil
+		}
+
+		lastErr = err
+		if deadlineExceeded {
+			atomic.AddUint64(&s.metrics.rateTimeoutsTotal, 1)
+		}
+		code := grpc.Code(err)
+		if ctx.Err() != nil ||
+			(code != codes.DeadlineExceeded && code != codes.Unavailable && code != codes.ResourceExhausted) {
+			break
+		}
+		if attempt < policy.maxAttempts {
+			time.Sleep(policy.backoff(attempt))
+		}
+	}
+
+	atomic.AddUint64(&s.metrics.rateFailuresTotal, 1)
+	return nil, lastErr
 }

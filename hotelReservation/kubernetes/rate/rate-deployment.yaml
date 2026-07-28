@@ -28,13 +28,19 @@ spec:
       containers:
         - command:
             - rate
-          image: yinfangchen/hotelreservation:latest
+          image: ghcr.io/sregym/hotel-reservation:latest
           name: hotel-reserv-rate
           ports:
             - containerPort: 8084
+            - containerPort: 9091
+              name: metrics
           env:
             - name: JAEGER_SAMPLE_RATIO
               value: "1"
+            - name: RATE_BACKEND_QPS_LIMIT
+              value: "500"
+            - name: RATE_QUEUE_CAPACITY
+              value: "256"
           resources:
             requests:
               cpu: 100m

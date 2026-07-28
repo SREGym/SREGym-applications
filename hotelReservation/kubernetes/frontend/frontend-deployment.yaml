@@ -32,7 +32,7 @@ spec:
       containers:
         - command:
             - frontend
-          image: yinfangchen/hotelreservation:latest
+          image: ghcr.io/sregym/hotel-reservation:latest
           name: hotel-reserv-frontend
           ports:
             - containerPort: 5000

@@ -28,7 +28,7 @@ spec:
       containers:
         - command:
             - recommendation
-          image: yinfangchen/hotelreservation:latest
+          image: ghcr.io/sregym/hotel-reservation:latest
           name: hotel-reserv-recommendation
           ports:
             - containerPort: 8085

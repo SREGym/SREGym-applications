@@ -18,15 +18,15 @@ container:
       mountPath: /usr/local/openresty/nginx/lua-scripts
 
 initContainer:
-  image: alpine/git
-  imageVersion: latest
+  dockerRegistry: ghcr.io/sregym
+  image: social-network-assets
+  imageVersion: v1
   name: alpine-container
   volumeMounts:
   - name: lua-scripts
     mountPath: /lua-scripts
   command: "/bin/sh" 
-  args: ["-c", "git clone https://github.com/delimitrou/DeathStarBench.git /DeathStarBench &&
-            cp -r /DeathStarBench/socialNetwork/media-frontend/lua-scripts/* /lua-scripts/"]
+  args: ["-c", "cp -r /opt/social-network/media/lua-scripts/. /lua-scripts/"]
 
 volumes:
   - name: lua-scripts

@@ -1,0 +1,11 @@
+FROM alpine:3.20
+
+LABEL org.opencontainers.image.source="https://github.com/SREGym/SREGym-applications"
+
+# Copy only application runtime files, not repository history or build inputs.
+COPY gen-lua/ /opt/social-network/gen-lua/
+COPY docker/openresty-thrift/lua-thrift/ /opt/social-network/lua-thrift/
+COPY nginx-web-server/lua-scripts/ /opt/social-network/nginx/lua-scripts/
+COPY nginx-web-server/pages/ /opt/social-network/nginx/pages/
+COPY media-frontend/lua-scripts/ /opt/social-network/media/lua-scripts/
+COPY keys/ /opt/social-network/keys/

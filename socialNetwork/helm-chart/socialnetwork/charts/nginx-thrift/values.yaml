@@ -27,8 +27,9 @@ container:
 
 
 initContainer:
-  image: alpine/git
-  imageVersion: latest
+  dockerRegistry: ghcr.io/sregym
+  image: social-network-assets
+  imageVersion: v1
   name: alpine-container
   volumeMounts:
   - name: lua-scripts
@@ -42,12 +43,11 @@ initContainer:
   - name: keys
     mountPath: /keys
   command: "/bin/sh" 
-  args: ["-c", "git clone https://github.com/delimitrou/DeathStarBench.git /DeathStarBench &&
-            cp -r /DeathStarBench/socialNetwork/gen-lua/* /gen-lua/ &&
-            cp -r /DeathStarBench/socialNetwork/docker/openresty-thrift/lua-thrift/* /lua-thrift/ &&
-            cp -r /DeathStarBench/socialNetwork/nginx-web-server/lua-scripts/* /lua-scripts/ &&
-            cp -r /DeathStarBench/socialNetwork/nginx-web-server/pages/* /pages/ &&
-            cp /DeathStarBench/socialNetwork/keys/* /keys/ "]
+  args: ["-c", "cp -r /opt/social-network/gen-lua/. /gen-lua/ &&
+            cp -r /opt/social-network/lua-thrift/. /lua-thrift/ &&
+            cp -r /opt/social-network/nginx/lua-scripts/. /lua-scripts/ &&
+            cp -r /opt/social-network/nginx/pages/. /pages/ &&
+            cp -r /opt/social-network/keys/. /keys/"]
 
 volumes:
   - name: lua-scripts

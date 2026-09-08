@@ -129,7 +129,8 @@ RUN apt-get update \
   && make -j$(nproc) \
   && make install \
   # Install pyyaml
-  && pip3 install PyYAML \
+  # Xenial ships Python 3.5; current PyYAML releases require a newer Python.
+  && pip3 install 'PyYAML==5.3.1' \
   # Clean up
   && cd /tmp \
   && rm -rf \

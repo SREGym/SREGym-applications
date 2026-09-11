@@ -5,8 +5,9 @@ ports:
     targetPort: 8080
 
 container:
-  image: yg397/media-frontend
-  imageVersion: xenial
+  dockerRegistry: ghcr.io
+  image: sregym/media-frontend
+  imageVersion: sha-d2c036bc3d1138f5a0bdaffd3d87f37522c3461a@sha256:32de5e0371ccb7f47f36e1f027ae0075a7e265e4eed374c1b1020fe213754d00
   name: media-frontend
   ports: 
   - containerPort: 8081

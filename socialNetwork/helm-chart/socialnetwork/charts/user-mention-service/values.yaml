@@ -6,7 +6,8 @@ ports:
 
 container:
   command: UserMentionService
-  image: deathstarbench/social-network-microservices
+  dockerRegistry: ghcr.io
+  image: sregym/social-network
   # image: yinfangchen/social-otel
   # imageVersion: test
   name: user-mention-service

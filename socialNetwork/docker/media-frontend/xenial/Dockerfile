@@ -119,10 +119,15 @@ RUN apt-get install -y wget libssl-dev \
     && make -j${RESTY_J} \
     && make -j${RESTY_J} install
 
-RUN luarocks install resty-mongol --server=http://rocks.moonscript.org \
-    && luarocks install luasocket \
-    && luarocks install chronos \
-    && luarocks install magick
+# Keep the versions used by the existing frontend, including resty-mongol's
+# luacrypto dependency. Direct source rocks avoid the root manifest, which now
+# exceeds the parser limit of this image's Lua 5.1 runtime.
+RUN luarocks install https://luarocks.org/luacrypto-0.3.2-2.src.rock --deps-mode=none \
+    && luarocks install https://luarocks.org/resty-mongol-0.8-4.rockspec --deps-mode=none \
+    && luarocks install https://luarocks.org/luasocket-3.1.0-1.src.rock --deps-mode=none \
+    && luarocks install https://luarocks.org/chronos-0.2-4.src.rock --deps-mode=none \
+    && luarocks install https://luarocks.org/magick-1.6.0-1.src.rock --deps-mode=none \
+    && ldconfig
 
 COPY lualongnumber /tmp/lualongnumber
 

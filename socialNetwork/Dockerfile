@@ -1,7 +1,8 @@
 # Portions Copyright (c) Microsoft Corporation
 # Licensed under the Apache License, Version 2.0. See LICENSE file in the project root for full license information.
 
-FROM yg397/thrift-microservice-deps:xenial AS builder
+ARG SOCIAL_NETWORK_BASE_IMAGE=yg397/thrift-microservice-deps:xenial
+FROM ${SOCIAL_NETWORK_BASE_IMAGE} AS builder
 
 ARG LIB_REDIS_PLUS_PLUS_VERSION=1.2.3
 ARG CMAKE_VERSION=3.27.9

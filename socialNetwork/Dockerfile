@@ -1,8 +1,9 @@
 # Portions Copyright (c) Microsoft Corporation
 # Licensed under the Apache License, Version 2.0. See LICENSE file in the project root for full license information.
 
-ARG SOCIAL_NETWORK_BASE_IMAGE=yg397/thrift-microservice-deps:xenial
+ARG SOCIAL_NETWORK_BASE_IMAGE=ghcr.io/sregym/social-network-deps:sha-d2c036bc3d1138f5a0bdaffd3d87f37522c3461a@sha256:7d66d10f9bd05ae8b635e0a861dbb9dd02ffd9ef1a49e6c383c3d97a981fb119
 FROM ${SOCIAL_NETWORK_BASE_IMAGE} AS builder
+COPY docker/patch-redis-plus-plus.py /tmp/patch-redis-plus-plus.py
 
 ARG LIB_REDIS_PLUS_PLUS_VERSION=1.2.3
 ARG CMAKE_VERSION=3.27.9
@@ -158,11 +159,9 @@ RUN mkdir build && cd build \
     && cmake --build . --target all -- -j`nproc` \
     && cmake --install .
 
-# Apply patch and re-install Redis plus plus
+# Rebuild the shared patched dependency with the application's GCC 7 toolchain.
 RUN cd /tmp/redis-plus-plus\
-&& if ! grep -q 'get_shards_pool' src/sw/redis++/redis_cluster.h; then \
-     sed -i '/Transaction transaction/i\\    ShardsPool* get_shards_pool(){\n        return &_pool;\n    }\n' src/sw/redis++/redis_cluster.h; \
-   fi \
+&& python3 /tmp/patch-redis-plus-plus.py src/sw/redis++/redis_cluster.h \
 && cmake -DREDIS_PLUS_PLUS_USE_TLS=ON -DCMAKE_C_COMPILER=gcc-7 -DCMAKE_CXX_COMPILER=g++-7 . \
 && make -j$(nproc) \
 && make install

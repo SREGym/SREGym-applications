@@ -32,7 +32,7 @@ spec:
             name: reserv-service-container-env
         - configMapRef:
             name: rpc
-        image: 777lefty/docker-reserv-service-container:latest
+        image: ghcr.io/sregym/blueprint-hotel:20260913-reserv@sha256:c5fe8969727ef67985af3e1d0bdfe076fc9567da4c5b1ddf8535bf9223e1bce1
         imagePullPolicy: IfNotPresent
         name: reserv-service-container
         ports:

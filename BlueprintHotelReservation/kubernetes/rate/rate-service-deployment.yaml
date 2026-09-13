@@ -32,7 +32,7 @@ spec:
             name: rate-service-container-env
         - configMapRef:
             name: rpc
-        image: 777lefty/docker-rate-service-container:latest
+        image: ghcr.io/sregym/blueprint-hotel:20260913-rate@sha256:a2facc6ef8a2e4daa62f5352bb295ccc04a53209478a2bc4c3a7786ac983fefb
         imagePullPolicy: IfNotPresent
         name: rate-service-container
         ports:

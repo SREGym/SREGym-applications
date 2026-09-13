@@ -32,7 +32,7 @@ spec:
             name: recomd-service-container-env
         - configMapRef:
             name: rpc
-        image: 777lefty/docker-recomd-service-container:latest
+        image: ghcr.io/sregym/blueprint-hotel:20260913-recomd@sha256:0c17bad221ab3da5f5273d43a875f893b44f47e00eeb785b7f4de3ca73d20b8a
         imagePullPolicy: IfNotPresent
         name: recomd-service-container
         ports:

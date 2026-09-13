@@ -32,7 +32,7 @@ spec:
             name: user-service-container-env
         - configMapRef:
             name: rpc
-        image: 777lefty/docker-user-service-container:latest
+        image: ghcr.io/sregym/blueprint-hotel:20260913-user@sha256:1a209c4dd50d5a851da719a33090d1a8733a168d27471f5b7deb338a2b02a357
         imagePullPolicy: IfNotPresent
         name: user-service-container
         ports:

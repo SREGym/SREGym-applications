@@ -32,7 +32,7 @@ spec:
             name: profile-service-container-env
         - configMapRef:
             name: rpc
-        image: 777lefty/docker-profile-service-container:latest
+        image: ghcr.io/sregym/blueprint-hotel:20260913-profile@sha256:47c0b5d95c085901b46fd30685daca60694d47285fbae349a2b8a4ebc1011d3d
         imagePullPolicy: IfNotPresent
         name: profile-service-container
         ports:

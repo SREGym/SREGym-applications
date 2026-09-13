@@ -32,7 +32,7 @@ spec:
             name: geo-service-container-env
         - configMapRef:
             name: rpc
-        image: 777lefty/docker-geo-service-container:latest
+        image: ghcr.io/sregym/blueprint-hotel:20260913-geo@sha256:2b511768f33cd50181eb68a941c91a01c85586dd9e069f5eee973163dfc904c2
         imagePullPolicy: IfNotPresent
         name: geo-service-container
         ports:

@@ -5,8 +5,9 @@ ports:
     targetPort: 8080
 
 container:
-  image: yg397/openresty-thrift
-  imageVersion: xenial
+  dockerRegistry: ghcr.io
+  image: sregym/openresty-thrift
+  imageVersion: sha-d2c036bc3d1138f5a0bdaffd3d87f37522c3461a@sha256:fa344a1bf5320c40e57476eea23706b91819c6d6faa03b34ec846c4d2e3c0d18
   name: nginx-thrift
   ports: 
   - containerPort: 8080
@@ -42,7 +43,7 @@ initContainer:
   - name: keys
     mountPath: /keys
   command: "/bin/sh" 
-  args: ["-c", "git clone https://github.com/delimitrou/DeathStarBench.git /DeathStarBench &&
+  args: ["-c", "git clone --depth 1 https://github.com/delimitrou/DeathStarBench.git /DeathStarBench &&
             cp -r /DeathStarBench/socialNetwork/gen-lua/* /gen-lua/ &&
             cp -r /DeathStarBench/socialNetwork/docker/openresty-thrift/lua-thrift/* /lua-thrift/ &&
             cp -r /DeathStarBench/socialNetwork/nginx-web-server/lua-scripts/* /lua-scripts/ &&

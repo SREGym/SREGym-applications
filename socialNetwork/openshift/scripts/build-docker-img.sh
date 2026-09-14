@@ -79,8 +79,8 @@ $EXEC push "$REGISTRY"/"$PROJECT"/"$SERVICE":"$TAG"
 # BUILD SOCIAL-NETWORK MICROSERVICE DEPS
 SERVICE="thrift-microservice-deps"
 if [[ $($EXEC images | grep $SERVICE | wc -l) -le 0 ]]; then
-  cd docker/thrift-microservice-deps
-  $EXEC build -t "$REGISTRY"/"$PROJECT"/"$SERVICE":"$TAG" -f cpp/Dockerfile .
+  $EXEC build -t "$REGISTRY"/"$PROJECT"/"$SERVICE":"$TAG" \
+    -f "$ROOT_FOLDER/docker/thrift-microservice-deps/cpp/Dockerfile" "$ROOT_FOLDER"
 else
   echo "$SERVICE image already exist"
 fi

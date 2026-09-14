@@ -32,7 +32,7 @@ spec:
             name: search-service-container-env
         - configMapRef:
             name: rpc
-        image: 777lefty/docker-search-service-container:latest
+        image: ghcr.io/sregym/blueprint-hotel:20260913-search@sha256:84d40f1e9f2adb2b732b288838071bdb414b9a20c5877283e06fd21a27919547
         imagePullPolicy: IfNotPresent
         name: search-service-container
         ports:

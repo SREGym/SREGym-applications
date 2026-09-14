@@ -1,4 +1,5 @@
 FROM ubuntu:16.04
+COPY docker/patch-redis-plus-plus.py /tmp/patch-redis-plus-plus.py
 
 ARG LIB_MONGOC_VERSION=1.15.0
 ARG LIB_THRIFT_VERSION=0.12.0
@@ -123,13 +124,13 @@ RUN apt-get update \
   && git clone https://github.com/sewenew/redis-plus-plus.git \
   && cd redis-plus-plus \
   && git checkout ${LIB_REDIS_PLUS_PLUS_VERSION} \
-  && sed -i '/Transaction transaction/i\\    ShardsPool* get_shards_pool(){\n        return &_pool;\n    }\n' \
-     src/sw/redis++/redis_cluster.h \
+  && python3 /tmp/patch-redis-plus-plus.py src/sw/redis++/redis_cluster.h \
   && cmake -DREDIS_PLUS_PLUS_USE_TLS=ON . \
   && make -j$(nproc) \
   && make install \
   # Install pyyaml
-  && pip3 install PyYAML \
+  # Xenial ships Python 3.5; current PyYAML releases require a newer Python.
+  && pip3 install 'PyYAML==5.3.1' \
   # Clean up
   && cd /tmp \
   && rm -rf \

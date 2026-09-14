@@ -15,7 +15,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: wlgen
-        image: 777lefty/wlgen-proc:latest
+        image: ghcr.io/sregym/blueprint-hotel:20260913-workload@sha256:873f718bb26bbe9568fc3b469aa6b1511e5cb70a602db4dc75f6db702d87cfac
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:

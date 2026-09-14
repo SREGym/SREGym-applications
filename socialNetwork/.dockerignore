@@ -7,3 +7,4 @@
 !/scripts/
 !/third_party/
 !/wrk2/
+!/docker/patch-redis-plus-plus.py

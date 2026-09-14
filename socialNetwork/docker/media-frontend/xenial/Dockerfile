@@ -10,7 +10,7 @@ ARG RESTY_VERSION="1.13.6.1"
 ARG RESTY_LUAROCKS_VERSION="3.5.0"
 ARG RESTY_OPENSSL_VERSION="1.0.2k"
 ARG RESTY_PCRE_VERSION="8.41"
-ARG RESTY_J="32"
+ARG RESTY_J="4"
 ARG RESTY_CONFIG_OPTIONS="\
     --with-file-aio \
     --with-http_addition_module \
@@ -72,7 +72,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && cd /tmp \
     && curl -fSL https://www.openssl.org/source/openssl-${RESTY_OPENSSL_VERSION}.tar.gz -o openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
     && tar xzf openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
-    && curl -fSL http://ftp.cs.stanford.edu/pub/exim/pcre/pcre-${RESTY_PCRE_VERSION}.tar.gz -o pcre-${RESTY_PCRE_VERSION}.tar.gz \
+    && curl -fSL https://ftp.exim.org/pub/pcre/pcre-${RESTY_PCRE_VERSION}.tar.gz -o pcre-${RESTY_PCRE_VERSION}.tar.gz \
     && tar xzf pcre-${RESTY_PCRE_VERSION}.tar.gz \
     && curl -fSL https://openresty.org/download/openresty-${RESTY_VERSION}.tar.gz -o openresty-${RESTY_VERSION}.tar.gz \
     && tar xzf openresty-${RESTY_VERSION}.tar.gz \
@@ -119,10 +119,15 @@ RUN apt-get install -y wget libssl-dev \
     && make -j${RESTY_J} \
     && make -j${RESTY_J} install
 
-RUN luarocks install resty-mongol --server=http://rocks.moonscript.org \
-    && luarocks install luasocket \
-    && luarocks install chronos \
-    && luarocks install magick
+# Keep the versions used by the existing frontend, including resty-mongol's
+# luacrypto dependency. Direct source rocks avoid the root manifest, which now
+# exceeds the parser limit of this image's Lua 5.1 runtime.
+RUN luarocks install https://luarocks.org/luacrypto-0.3.2-2.src.rock --deps-mode=none \
+    && luarocks install https://luarocks.org/resty-mongol-0.8-4.rockspec --deps-mode=none \
+    && luarocks install https://luarocks.org/luasocket-3.1.0-1.src.rock --deps-mode=none \
+    && luarocks install https://luarocks.org/chronos-0.2-4.src.rock --deps-mode=none \
+    && luarocks install https://luarocks.org/magick-1.6.0-1.src.rock --deps-mode=none \
+    && ldconfig
 
 COPY lualongnumber /tmp/lualongnumber
 

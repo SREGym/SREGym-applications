@@ -32,7 +32,7 @@ spec:
             name: frontend-service-container-env
         - configMapRef:
             name: rpc
-        image: 777lefty/docker-frontend-service-container:latest
+        image: ghcr.io/sregym/blueprint-hotel:20260913-frontend@sha256:e853a492c6de4da95809d0aae3a3a62aa9ab860aa3d43f5de5d9af0c50fd950f
         imagePullPolicy: IfNotPresent
         name: frontend-service-container
         ports:

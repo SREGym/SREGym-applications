@@ -1,0 +1,17 @@
+**
+!gen-lua/
+!gen-lua/**
+!docker/
+!docker/openresty-thrift/
+!docker/openresty-thrift/lua-thrift/
+!docker/openresty-thrift/lua-thrift/**
+!nginx-web-server/
+!nginx-web-server/lua-scripts/
+!nginx-web-server/lua-scripts/**
+!nginx-web-server/pages/
+!nginx-web-server/pages/**
+!media-frontend/
+!media-frontend/lua-scripts/
+!media-frontend/lua-scripts/**
+!keys/
+!keys/**

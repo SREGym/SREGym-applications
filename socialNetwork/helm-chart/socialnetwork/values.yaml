@@ -1,5 +1,11 @@
 global: 
   replicas: 1
+  # When set, services that derive their machine ID from eth0's MAC address
+  # (readsMacAddress in their values) read this MAC from a ConfigMap file
+  # mounted over /sys/class/net/eth0/address instead. For hosts whose pods
+  # cannot read that sysfs file, such as Sysbox sandboxes. Empty: read the
+  # real MAC.
+  fixedMacAddress: ""
   imagePullPolicy: "IfNotPresent"
   restartPolicy: Always
   serviceType: ClusterIP

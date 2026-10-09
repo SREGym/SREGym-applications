@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: worker}
+spec:
+  replicas: {{ .Values.replicas.worker }}
+  selector: {matchLabels: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: worker}}
+  template:
+    metadata:
+      labels:
+        {{- include "codehub.labels" . | nindent 8 }}
+        app.kubernetes.io/component: worker
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        {{- include "codehub.security" . | nindent 8 }}
+      {{- include "codehub.placement" . | nindent 6 }}
+      initContainers:
+        - name: broker-membership
+          image: {{ .Values.image.repository | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          command:
+            - python
+            - -c
+            - |
+              import base64,json,pathlib,time,urllib.request
+              password=pathlib.Path('/run/credentials/broker-password').read_text().strip()
+              authorization=base64.b64encode(('codehub:'+password).encode()).decode()
+              deadline=time.monotonic()+180
+              while time.monotonic()<deadline:
+                  try:
+                      request=urllib.request.Request('http://queue:15672/api/nodes',headers={'Authorization':'Basic '+authorization})
+                      with urllib.request.urlopen(request,timeout=3) as response:
+                          nodes=json.load(response)
+                      if len(nodes)==3 and all(node.get('running') for node in nodes):
+                          break
+                  except Exception:
+                      pass
+                  time.sleep(2)
+              else:
+                  raise SystemExit('Broker cluster did not become available')
+          resources: {requests: {cpu: 25m, memory: 32Mi}, limits: {cpu: 100m, memory: 128Mi}}
+          volumeMounts: [{name: credentials, mountPath: /run/credentials, readOnly: true}]
+      containers:
+        - name: worker
+          image: {{ .Values.image.repository | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: [python, -m, codehub.worker]
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          env:
+            {{- include "codehub.env" . | nindent 12 }}
+          readinessProbe:
+            exec:
+              command: [python, -c, "import pathlib,time; p=pathlib.Path('/var/lib/codehub/worker-heartbeat'); exit(0 if p.exists() and time.time()-p.stat().st_mtime < 60 else 1)"]
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            exec:
+              command: [python, -c, "import pathlib,time; p=pathlib.Path('/var/lib/codehub/worker-heartbeat'); exit(0 if p.exists() and time.time()-p.stat().st_mtime < 90 else 1)"]
+            initialDelaySeconds: 90
+            periodSeconds: 15
+          resources:
+            {{- toYaml .Values.services.worker.resources | nindent 12 }}
+          volumeMounts:
+            - {name: credentials, mountPath: /run/credentials, readOnly: true}
+            - {name: data, mountPath: /var/lib/codehub}
+            - {name: tmp, mountPath: /tmp}
+            - {name: routes, mountPath: /etc/codehub, readOnly: true}
+      volumes:
+        - {name: credentials, secret: {secretName: {{ .Values.credentialsSecret }}, defaultMode: 0440}}
+        - {name: data, emptyDir: {sizeLimit: 512Mi}}
+        - {name: tmp, emptyDir: {sizeLimit: 512Mi}}
+        - {name: routes, configMap: {name: worker-database-routes}}

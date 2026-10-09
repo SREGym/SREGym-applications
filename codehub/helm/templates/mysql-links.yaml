@@ -1,0 +1,24 @@
+{{- range .Values.databaseLinks }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "codehub.labels" $ | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports: [{name: mysql, port: 3306, protocol: TCP, targetPort: mysql}]
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "codehub.labels" $ | nindent 4 }}
+    kubernetes.io/service-name: {{ .name }}
+    endpointslice.kubernetes.io/managed-by: codehub.local
+addressType: IPv4
+ports: [{name: mysql, protocol: TCP, port: {{ .port }}}]
+endpoints: []
+---
+{{- end }}

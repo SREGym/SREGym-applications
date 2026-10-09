@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["region", "regions", "image", "mysql", "replicas", "quota"],
+  "properties": {
+    "region": {"type": "string", "pattern": "^region-[a-z]$"},
+    "regions": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string", "pattern": "^region-[a-z]$"}},
+    "image": {"type": "object", "required": ["repository", "pullPolicy"], "properties": {"repository": {"type": "string", "minLength": 1}, "pullPolicy": {"enum": ["Never", "IfNotPresent", "Always"]}}},
+    "replicas": {"type": "object", "required": ["api", "worker", "search"], "properties": {"api": {"type": "integer", "minimum": 1}, "worker": {"type": "integer", "minimum": 1}, "search": {"type": "integer", "minimum": 1}}},
+    "mysql": {"type": "object", "required": ["image", "primaryHost", "readHost", "instances"], "properties": {"instances": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["name", "serverId", "writable"], "properties": {"name": {"type": "string", "pattern": "^mysql-g[0-9]+-(writer|reader|candidate)$"}, "serverId": {"type": "integer", "minimum": 1}, "writable": {"type": "boolean"}}}}}},
+    "clientCIDRs": {"type": "array", "items": {"type": "string"}},
+    "webhookHosts": {"type": "array", "items": {"type": "string"}}
+  }
+}

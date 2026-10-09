@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: gateway-config}
+data:
+  nginx.conf: |
+    worker_processes 1;
+    pid /tmp/nginx.pid;
+    error_log /dev/stderr warn;
+    events { worker_connections 1024; }
+    http {
+      access_log /dev/stdout;
+      client_body_temp_path /tmp/client_body;
+      proxy_temp_path /tmp/proxy;
+      fastcgi_temp_path /tmp/fastcgi;
+      uwsgi_temp_path /tmp/uwsgi;
+      scgi_temp_path /tmp/scgi;
+      server {
+        listen 8080;
+        listen 8443 ssl;
+        ssl_certificate /run/tls/tls.crt;
+        ssl_certificate_key /run/tls/tls.key;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        client_max_body_size 64m;
+        location /git/ { proxy_pass http://repository:8080; proxy_set_header Host $host; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; }
+        location / { proxy_pass http://api:8080; proxy_set_header Host $host; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; }
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: gateway}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: gateway}}
+  template:
+    metadata:
+      labels:
+        {{- include "codehub.labels" . | nindent 8 }}
+        app.kubernetes.io/component: gateway
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 101, runAsGroup: 101, fsGroup: 101, seccompProfile: {type: RuntimeDefault}}
+      {{- include "codehub.placement" . | nindent 6 }}
+      containers:
+        - name: gateway
+          image: {{ .Values.gateway.image | quote }}
+          command: [nginx, -g, "daemon off;"]
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          ports: [{name: http, containerPort: 8080}, {name: https, containerPort: 8443}]
+          readinessProbe: {httpGet: {path: /healthz, port: http}, periodSeconds: 3}
+          resources:
+            {{- toYaml .Values.gateway.resources | nindent 12 }}
+          volumeMounts:
+            - {name: config, mountPath: /etc/nginx/nginx.conf, subPath: nginx.conf, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+            - {name: tls, mountPath: /run/tls, readOnly: true}
+      volumes:
+        - {name: config, configMap: {name: gateway-config}}
+        - {name: tmp, emptyDir: {sizeLimit: 128Mi}}
+        - {name: tls, secret: {secretName: gateway-tls, defaultMode: 0440}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: gateway}
+spec:
+  selector: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: gateway}
+  ports: [{name: http, port: 8080, targetPort: http}, {name: https, port: 8443, targetPort: https}]

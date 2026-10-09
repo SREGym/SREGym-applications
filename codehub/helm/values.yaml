@@ -1,0 +1,71 @@
+region: region-a
+regions: [region-a, region-b]
+image:
+  repository: codehub:local
+  pullPolicy: IfNotPresent
+storageClass: openebs-hostpath
+credentialsSecret: service-credentials
+replicas:
+  api: 2
+  worker: 2
+  search: 1
+mysql:
+  image: docker.io/library/mysql:8.4.6@sha256:869218921e61d6c3c89820955d63cca42971f0e3e6c1e2792247bbd944ebc6e9
+  database: codehub
+  user: codehub
+  primaryHost: mysql-g0-writer.codehub-region-a.svc.cluster.local
+  readHost: mysql-g0-reader.codehub-region-a.svc.cluster.local
+  writerRoutes:
+    - {name: mysql-g0-writer-route, host: mysql-g0-writer.codehub-region-a.svc.cluster.local}
+  storage: 2Gi
+  instances:
+    - {name: mysql-g0-writer, serverId: 1, writable: true}
+    - {name: mysql-g0-reader, serverId: 2, writable: false}
+  resources:
+    requests: {cpu: 100m, memory: 512Mi}
+    limits: {cpu: 1, memory: 2Gi}
+queue:
+  image: docker.io/library/rabbitmq:4.1.8-management@sha256:19c5ee40801d36eaa46020c9e2ff802c4ef7e74839a00b0f8bd43f935f845778
+  storage: 1Gi
+  resources:
+    requests: {cpu: 100m, memory: 256Mi}
+    limits: {cpu: 500m, memory: 1Gi}
+gateway:
+  image: docker.io/library/nginx:1.28.0-alpine@sha256:30f1c0d78e0ad60901648be663a710bdadf19e4c10ac6782c235200619158284
+  resources:
+    requests: {cpu: 25m, memory: 32Mi}
+    limits: {cpu: 200m, memory: 128Mi}
+services:
+  api:
+    resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: 500m, memory: 512Mi}}
+  worker:
+    resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: 500m, memory: 512Mi}}
+  search:
+    storage: 1Gi
+    resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: 500m, memory: 1Gi}}
+  repository:
+    storage: 4Gi
+    resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: 500m, memory: 512Mi}}
+  delivery:
+    storage: 1Gi
+    artifactStorage: 2Gi
+    resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: 500m, memory: 512Mi}}
+topology:
+  automaticPromotion: false
+  failureThreshold: 3
+  probeIntervalSeconds: 2
+  maximumLagSeconds: 30
+  storage: 128Mi
+  resources: {requests: {cpu: 25m, memory: 32Mi}, limits: {cpu: 100m, memory: 128Mi}}
+quota: {cpu: "8", memory: 16Gi, storage: 20Gi}
+clientCIDRs: []
+webhookHosts: []
+webhookEgress: []
+databaseRoutes: {}
+workerDatabaseRoutes: {}
+databaseLinks: []
+observability:
+  namespaces: [observe]
+  otlpEndpoint: http://telemetry:4318
+  traceEndpoint: jaeger-agent.observe.svc.cluster.local:4317
+  image: docker.io/otel/opentelemetry-collector-contrib:0.121.0@sha256:789689988e379c58ac12b07718dbcf4b23c2214bd804173c1c77af346d381c15

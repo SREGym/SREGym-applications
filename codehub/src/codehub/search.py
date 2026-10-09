@@ -27,6 +27,21 @@ class SearchIndex:
                 "revision INTEGER NOT NULL,kind TEXT NOT NULL,document TEXT NOT NULL,PRIMARY KEY(tenant_id,id));"
                 "CREATE VIRTUAL TABLE IF NOT EXISTS documents_fts USING fts5(tenant_id UNINDEXED,id UNINDEXED,text);"
             )
+            connection.execute("BEGIN IMMEDIATE")
+            version = connection.execute("PRAGMA user_version").fetchone()[0]
+            if version not in (0, 1):
+                raise DomainError("Search storage schema is newer than this service")
+            if version == 0:
+                # Older projections used unrelated FTS rowids. Rebuild atomically
+                # from durable documents and retain processed effect identities.
+                connection.execute("DELETE FROM documents_fts")
+                connection.execute(
+                    "INSERT INTO documents_fts(rowid,tenant_id,id,text) "
+                    "SELECT d.rowid,d.tenant_id,d.id,COALESCE((SELECT group_concat(value,' ') "
+                    "FROM json_each(d.document) WHERE key IN ('title','body','name','slug','ref') "
+                    "AND type='text'),'') FROM documents d"
+                )
+                connection.execute("PRAGMA user_version=1")
 
     @contextmanager
     def connect(self):
@@ -63,15 +78,18 @@ class SearchIndex:
                     "document=excluded.document",
                     (op.tenant_id, op.entity_id, op.project_id, op.client_revision, op.kind, canonical(op.payload)),
                 )
-                connection.execute("DELETE FROM documents_fts WHERE tenant_id=? AND id=?", (op.tenant_id, op.entity_id))
+                rowid = connection.execute(
+                    "SELECT rowid FROM documents WHERE tenant_id=? AND id=?", (op.tenant_id, op.entity_id)
+                ).fetchone()[0]
+                connection.execute("DELETE FROM documents_fts WHERE rowid=?", (rowid,))
                 searchable = " ".join(
                     value
                     for key, value in op.payload.items()
                     if key in {"title", "body", "name", "slug", "ref"} and isinstance(value, str)
                 )
                 connection.execute(
-                    "INSERT INTO documents_fts(tenant_id,id,text) VALUES(?,?,?)",
-                    (op.tenant_id, op.entity_id, searchable),
+                    "INSERT INTO documents_fts(rowid,tenant_id,id,text) VALUES(?,?,?,?)",
+                    (rowid, op.tenant_id, op.entity_id, searchable),
                 )
             connection.execute(
                 "INSERT INTO processed(effect_id,payload_sha256) VALUES(?,?)", (effect_id, operation_digest)
@@ -85,7 +103,7 @@ class SearchIndex:
         expression = " AND ".join('"' + word.replace('"', '""') + '"' for word in query.split()[:20])
         with self.connect() as connection:
             rows = connection.execute(
-                "SELECT d.* FROM documents_fts f JOIN documents d ON d.tenant_id=f.tenant_id AND d.id=f.id "
+                "SELECT d.* FROM documents_fts f JOIN documents d ON d.rowid=f.rowid "
                 "WHERE documents_fts MATCH ? AND d.tenant_id=? ORDER BY bm25(documents_fts),d.id LIMIT ?",
                 (expression, tenant_id, limit),
             ).fetchall()

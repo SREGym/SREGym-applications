@@ -4,19 +4,22 @@ import os
 import hmac
 import re
 import signal
+import sqlite3
 import subprocess
 import threading
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, closing
 from pathlib import Path
 from tempfile import TemporaryFile
 
 from fastapi import FastAPI, Request, Response
+from starlette.concurrency import run_in_threadpool
 
 from codehub.config import Settings, secret
 from codehub.domain import DomainError, Forbidden, identifier
 from codehub.http_support import git_credential, require_service, serve
 from codehub.storage.mysql import MySQLStorage
 from codehub.storage.routing import StorageRouter
+from codehub.projects import ref_name
 from codehub.repository_sync import RepositorySynchronizer
 from codehub.telemetry import Telemetry
 
@@ -27,7 +30,17 @@ class Repository:
     def __init__(self, root: Path):
         self.root = root
         self.initialization_lock = threading.Lock()
+        self.reference_lock = threading.Lock()
         root.mkdir(parents=True, exist_ok=True)
+        self.publication_state = root / "reference-publications.sqlite"
+        with closing(sqlite3.connect(self.publication_state)) as database:
+            database.execute(
+                "CREATE TABLE IF NOT EXISTS publications(project TEXT,ref TEXT,entity TEXT,revision INTEGER,sha TEXT,PRIMARY KEY(project,ref))"
+            )
+            database.execute(
+                "CREATE TABLE IF NOT EXISTS publication_intents(project TEXT,ref TEXT,entity TEXT,revision INTEGER,sha TEXT,expected_sha TEXT,PRIMARY KEY(project,ref))"
+            )
+            database.commit()
 
     def path(self, project_id: str) -> Path:
         identifier(project_id, "project_id")
@@ -82,6 +95,81 @@ class Repository:
         parents = self.git(project_id, "rev-list", "--parents", "-n", "1", commit_sha, maximum=4096).decode().split()
         return {"commit_sha": parents[0], "parents": parents[1:]}
 
+    def publish_reference(self, project_id, reference):
+        """Publish a new SQL revision without overwriting an unacknowledged push."""
+        ref = ref_name({"ref": reference["ref"]}, "ref")
+        identifier(reference["id"], "repository_id")
+        revision, desired = reference["revision"], reference["commit_sha"]
+        if type(revision) is not int or revision < 1:
+            raise DomainError("Reference publication requires an accepted positive revision")
+        self.commit(project_id, desired)
+        with self.reference_lock, closing(sqlite3.connect(self.publication_state)) as database:
+            database.execute("PRAGMA synchronous=FULL")
+            actual = self._reference_value(project_id, ref)
+            pending = database.execute(
+                "SELECT entity,revision,sha,expected_sha FROM publication_intents WHERE project=? AND ref=?",
+                (project_id, ref),
+            ).fetchone()
+            if pending:
+                if actual == pending[3]:
+                    self.git(project_id, "update-ref", ref, pending[2], actual or "0" * 40, maximum=4096)
+                    actual = pending[2]
+                if actual == pending[2]:
+                    self._record_publication(database, project_id, ref, *pending[:3])
+                elif actual != desired:
+                    return  # Preserve a concurrent local upload and its durable intent.
+            previous = database.execute(
+                "SELECT entity,revision,sha FROM publications WHERE project=? AND ref=?", (project_id, ref)
+            ).fetchone()
+            if previous and previous[0] == reference["id"]:
+                if revision < previous[1]:
+                    return
+                if revision == previous[1]:
+                    if desired != previous[2]:
+                        raise DomainError("Accepted reference revision has conflicting content")
+            if actual != desired:
+                # A local Git upload precedes its API receipt. Only replace the
+                # last published object (or an absent ref), never a newer local
+                # upload. Git's compare-and-swap also guards a concurrent push.
+                if (previous and actual == previous[2]) or actual is None:
+                    # SQLite commits the accepted transition before Git changes.
+                    # On restart the intent identifies a completed CAS even if
+                    # authoritative SQL advanced while this process was down.
+                    database.execute(
+                        "INSERT INTO publication_intents VALUES(?,?,?,?,?,?) "
+                        "ON CONFLICT(project,ref) DO UPDATE SET entity=excluded.entity,revision=excluded.revision,"
+                        "sha=excluded.sha,expected_sha=excluded.expected_sha",
+                        (project_id, ref, reference["id"], revision, desired, actual),
+                    )
+                    database.commit()
+                    self.git(project_id, "update-ref", ref, desired, actual or "0" * 40, maximum=4096)
+                elif previous:
+                    return
+                # On first observation preserve the local ref while recording
+                # the SQL revision; its later acknowledged revision can publish.
+            self._record_publication(database, project_id, ref, reference["id"], revision, desired)
+
+    def _reference_value(self, project_id, ref):
+        for line in (
+            self.git(project_id, "for-each-ref", "--format=%(refname) %(objectname)", ref, maximum=65536)
+            .decode()
+            .splitlines()
+        ):
+            name, commit = line.split()
+            if name == ref:
+                return commit
+        return None
+
+    @staticmethod
+    def _record_publication(database, project_id, ref, entity, revision, sha):
+        database.execute(
+            "INSERT INTO publications VALUES(?,?,?,?,?) ON CONFLICT(project,ref) DO UPDATE "
+            "SET entity=excluded.entity,revision=excluded.revision,sha=excluded.sha",
+            (project_id, ref, entity, revision, sha),
+        )
+        database.execute("DELETE FROM publication_intents WHERE project=? AND ref=?", (project_id, ref))
+        database.commit()
+
     def ref(self, project_id: str, ref: str) -> str:
         if not ref.startswith("refs/heads/"):
             raise DomainError("A branch ref is required")
@@ -99,8 +187,10 @@ class Repository:
     def backend(self, project_id, tail, *, method, query, content_type, actor_id, body, default_ref="refs/heads/main"):
         if tail not in {"info/refs", "git-upload-pack", "git-receive-pack"}:
             raise DomainError("Only Git smart HTTP endpoints are supported")
-        self.ensure(project_id)
-        self.git(project_id, "symbolic-ref", "HEAD", default_ref, maximum=4096)
+        path = self.ensure(project_id)
+        with self.initialization_lock:
+            if (path / "HEAD").read_text().strip() != f"ref: {default_ref}":
+                self.git(project_id, "symbolic-ref", "HEAD", default_ref, maximum=4096)
         env = {
             **os.environ,
             "GIT_PROJECT_ROOT": str(self.root.resolve()),
@@ -216,20 +306,25 @@ def make_app(settings=None, storage=None, repository=None):
         service = request.query_params.get("service", "")
         write = tail == "git-receive-pack" or service == "git-receive-pack"
         credential = git_credential(request)
-        if hmac.compare_digest(credential, secret("CODEHUB_SERVICE_TOKEN")):
-            if write:
-                raise Forbidden("Replication service credentials permit reads only")
-            _storage = router.for_project(project_id, None)
-            actor = "repository-service"
-        else:
-            _storage, actor = router.authenticated_project(project_id, credential, write=write)
-        project = _storage.project(project_id, None)
+
+        def authorize():
+            if hmac.compare_digest(credential, secret("CODEHUB_SERVICE_TOKEN")):
+                if write:
+                    raise Forbidden("Replication service credentials permit reads only")
+                _storage = router.for_project(project_id, None)
+                actor = "repository-service"
+            else:
+                _storage, actor = router.authenticated_project(project_id, credential, write=write)
+            return actor, _storage.project(project_id, None)
+
+        actor, project = await run_in_threadpool(authorize)
         chunks = bytearray()
         async for chunk in request.stream():
-            chunks.extend(chunk)
-            if len(chunks) > MAX_GIT_BYTES:
+            if len(chunks) + len(chunk) > MAX_GIT_BYTES:
                 raise DomainError("Git input exceeds service capacity")
-        return repository.backend(
+            chunks.extend(chunk)
+        return await run_in_threadpool(
+            repository.backend,
             project_id,
             tail,
             method=request.method,

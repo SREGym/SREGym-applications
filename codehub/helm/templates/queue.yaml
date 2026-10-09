@@ -39,7 +39,7 @@ spec:
     spec:
       automountServiceAccountToken: false
       securityContext: {runAsNonRoot: true, runAsUser: 999, runAsGroup: 999, fsGroup: 999, seccompProfile: {type: RuntimeDefault}}
-      {{- include "codehub.placement" . | nindent 6 }}
+      {{- include "codehub.placement" (dict "root" . "component" "queue") | nindent 6 }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

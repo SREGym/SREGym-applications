@@ -106,8 +106,12 @@ class TopologyManager:
             host = self.configuration["candidate_host"]
             with self._connect(host) as connection, connection.cursor() as cursor:
                 cursor.execute("STOP REPLICA")
-                cursor.execute("SET GLOBAL super_read_only=OFF")
-                cursor.execute("SET GLOBAL read_only=OFF")
+                # Promotion remains in effect after the database restarts.
+                # Retain the upstream channel/history for operator inspection,
+                # but do not resume the obsolete writer stream automatically.
+                cursor.execute("SET PERSIST_ONLY skip_replica_start=ON")
+                cursor.execute("SET PERSIST super_read_only=OFF")
+                cursor.execute("SET PERSIST read_only=OFF")
             self._route(host, self.configuration["routing_service"])
             self.state["promoted"] = True
             self.state["writer_host"] = host

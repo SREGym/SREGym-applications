@@ -54,7 +54,7 @@ spec:
     spec:
       automountServiceAccountToken: false
       securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
-      {{- include "codehub.placement" . | nindent 6 }}
+      {{- include "codehub.placement" (dict "root" . "component" "telemetry") | nindent 6 }}
       containers:
         - name: telemetry
           image: {{ .Values.observability.image | quote }}

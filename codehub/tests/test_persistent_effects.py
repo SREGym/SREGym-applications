@@ -89,3 +89,60 @@ def test_failed_delivery_is_retained_and_retry_uses_same_identity(tmp_path, monk
     result = store.deliver("e" * 64, event_id, "https://notifications.example/events", payload, sender=recovered)
     assert result["attempts"] == 2
     assert identities == ["e" * 64, "e" * 64]
+
+
+def test_legacy_fts_migration_preserves_effect_dedupe_and_updates_one_indexed_row(tmp_path):
+    path = tmp_path / "search.sqlite"
+    index = SearchIndex(path)
+    first = op(1, "Legacy routing")
+    index.index("a" * 64, first)
+    with index.connect() as db:
+        db.execute("UPDATE documents_fts SET rowid=999")
+        db.execute("PRAGMA user_version=0")
+    index = SearchIndex(path)
+    with index.connect() as db:
+        assert (
+            db.execute("SELECT d.rowid=f.rowid FROM documents d JOIN documents_fts f USING(tenant_id,id)").fetchone()[0]
+            == 1
+        )
+    assert index.index("a" * 64, first)["effect_id"] == "a" * 64
+    latest = {
+        **first,
+        "event_id": str(uuid4()),
+        "client_revision": 2,
+        "payload": {**first["payload"], "title": "Regional routing"},
+    }
+    index.index("b" * 64, latest)
+    restarted = SearchIndex(path)
+    assert restarted.search(first["tenant_id"], "Legacy") == []
+    assert restarted.search(first["tenant_id"], "Regional")[0]["revision"] == 2
+    with restarted.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM documents_fts").fetchone()[0] == 1
+        assert db.execute("SELECT COUNT(*) FROM processed").fetchone()[0] == 2
+
+
+def test_fts_rowid_delete_vm_work_stays_bounded_as_index_grows(tmp_path):
+    index = SearchIndex(tmp_path / "search.sqlite")
+    work = []
+    with index.connect() as db:
+        for total in (200, 2000):
+            prior = db.execute("SELECT COUNT(*) FROM documents").fetchone()[0]
+            for number in range(prior + 1, total + 1):
+                db.execute(
+                    "INSERT INTO documents VALUES(?,?,?,?,?,?)", ("tenant", str(number), "project", 1, "issue", "{}")
+                )
+                db.execute(
+                    "INSERT INTO documents_fts(rowid,tenant_id,id,text) VALUES(?,?,?,?)",
+                    (number, "tenant", str(number), "routing"),
+                )
+            steps = [0]
+
+            def progress():
+                steps[0] += 1
+                return 0
+
+            db.set_progress_handler(progress, 1)
+            db.execute("DELETE FROM documents_fts WHERE rowid=?", (total,))
+            db.set_progress_handler(None, 0)
+            work.append(steps[0])
+    assert work[1] < 3 * work[0], work

@@ -1,5 +1,6 @@
 """Write/provisioning requests preserve semantics while database IO waits."""
 
+import asyncio
 import threading
 from types import SimpleNamespace
 from unittest.mock import Mock
@@ -241,3 +242,204 @@ def test_malformed_envelopes_never_reach_storage(endpoint, path, body):
     assert response.status_code == 422
     endpoint.router.for_tenant.assert_not_called()
     endpoint.router.groups.assert_not_called()
+
+
+@pytest.fixture
+def git_endpoint(monkeypatch, tmp_path):
+    from fastapi import Response
+
+    from codehub import repository as module
+
+    monkeypatch.setenv("CODEHUB_SERVICE_TOKEN", "replication-token")
+    monkeypatch.delenv("CODEHUB_SERVICE_TOKEN_FILE", raising=False)
+    monkeypatch.delenv("CODEHUB_REPOSITORY_PEERS", raising=False)
+    store, router, repository = Mock(), Mock(), Mock()
+    router.authenticated_project.return_value = (store, "customer")
+    router.for_project.return_value = store
+    store.project.return_value = {"default_ref": "refs/heads/main"}
+    repository.backend.return_value = Response(b"git-packet", media_type="application/x-git-upload-pack-result")
+    monkeypatch.setattr(module, "StorageRouter", lambda _settings: router)
+    settings = SimpleNamespace(region="region-a", data_dir=tmp_path)
+    with TestClient(module.make_app(settings=settings, storage=store, repository=repository)) as client:
+        yield SimpleNamespace(client=client, router=router, store=store, repository=repository)
+
+
+@pytest.mark.parametrize("gate", ["authenticate", "project", "backend"])
+def test_git_sql_or_subprocess_wait_does_not_block_health_or_other_repository_requests(git_endpoint, gate):
+    endpoint = git_endpoint
+    method = {
+        "authenticate": endpoint.router.authenticated_project,
+        "project": endpoint.store.project,
+        "backend": endpoint.repository.backend,
+    }[gate]
+    expected = method.return_value
+    started, release = threading.Event(), threading.Event()
+    responses, concurrent = [], []
+
+    def wait_for_io(*_args, **_kwargs):
+        started.set()
+        if not release.wait(5):
+            raise RuntimeError("Test repository IO gate was not released")
+        return expected
+
+    method.side_effect = wait_for_io
+    request = threading.Thread(
+        target=lambda: responses.append(
+            endpoint.client.post(
+                f"/git/{uid(200)}/git-upload-pack",
+                content=b"upload-packet",
+                headers={
+                    "Authorization": "Bearer customer-token",
+                    "Content-Type": "application/x-git-upload-pack-request",
+                },
+            )
+        ),
+        daemon=True,
+    )
+
+    def other_requests():
+        concurrent.append(endpoint.client.get("/healthz"))
+        concurrent.append(
+            endpoint.client.get(
+                f"/internal/projects/{uid(200)}/commits/{'ab' * 20}",
+                headers={"Authorization": "Bearer replication-token"},
+            )
+        )
+
+    endpoint.repository.commit.return_value = {"commit_sha": "ab" * 20, "parents": []}
+    observer = threading.Thread(target=other_requests, daemon=True)
+    try:
+        request.start()
+        assert started.wait(3)
+        observer.start()
+        observer.join(2)
+        assert not observer.is_alive(), "Git/SQL IO blocked the repository HTTP event loop"
+        assert [response.status_code for response in concurrent] == [200, 200]
+        assert request.is_alive()
+    finally:
+        release.set()
+        request.join(3)
+        if observer.ident is not None:
+            observer.join(3)
+    assert not request.is_alive() and not observer.is_alive()
+    assert responses[0].status_code == 200 and responses[0].content == b"git-packet"
+    endpoint.router.authenticated_project.assert_called_once_with(uid(200), "customer-token", write=False)
+    endpoint.store.project.assert_called_once_with(uid(200), None)
+    endpoint.repository.backend.assert_called_once_with(
+        uid(200),
+        "git-upload-pack",
+        method="POST",
+        query="",
+        content_type="application/x-git-upload-pack-request",
+        actor_id="customer",
+        body=b"upload-packet",
+        default_ref="refs/heads/main",
+    )
+
+
+@pytest.mark.parametrize("service", [False, True])
+@pytest.mark.parametrize("write", [False, True])
+def test_git_offloading_preserves_customer_and_replication_authority(git_endpoint, service, write):
+    endpoint = git_endpoint
+    token = "replication-token" if service else "customer-token"
+    verb = "git-receive-pack" if write else "git-upload-pack"
+    response = endpoint.client.get(
+        f"/git/{uid(200)}/info/refs?service={verb}", headers={"Authorization": f"Bearer {token}"}
+    )
+    if service and write:
+        assert response.status_code == 403
+        endpoint.router.for_project.assert_not_called()
+        endpoint.store.project.assert_not_called()
+        endpoint.repository.backend.assert_not_called()
+    else:
+        assert response.status_code == 200 and response.content == b"git-packet"
+        endpoint.store.project.assert_called_once_with(uid(200), None)
+        if service:
+            endpoint.router.for_project.assert_called_once_with(uid(200), None)
+        else:
+            endpoint.router.authenticated_project.assert_called_once_with(uid(200), token, write=write)
+        assert endpoint.repository.backend.call_args.kwargs["actor_id"] == (
+            "repository-service" if service else "customer"
+        )
+
+
+@pytest.mark.parametrize("gate", ["authenticate", "project", "backend"])
+def test_git_offloaded_domain_failures_preserve_status_and_prevent_backend_when_denied(git_endpoint, gate):
+    endpoint = git_endpoint
+    method = {
+        "authenticate": endpoint.router.authenticated_project,
+        "project": endpoint.store.project,
+        "backend": endpoint.repository.backend,
+    }[gate]
+    method.side_effect = Forbidden("Repository access denied")
+    response = endpoint.client.get(
+        f"/git/{uid(200)}/info/refs?service=git-receive-pack", headers={"Authorization": "Bearer customer-token"}
+    )
+    assert response.status_code == 403 and response.json() == {"detail": "Repository access denied"}
+    assert response.headers["www-authenticate"] == 'Basic realm="CodeHub"'
+    if gate != "backend":
+        endpoint.repository.backend.assert_not_called()
+
+
+@pytest.mark.parametrize("gate", ["authenticate", "project", "replication_write"])
+def test_denied_git_post_does_not_read_the_upload_body(git_endpoint, gate):
+    from starlette.requests import Request
+
+    endpoint = git_endpoint
+    token = "replication-token" if gate == "replication_write" else "customer-token"
+    if gate == "authenticate":
+        endpoint.router.authenticated_project.side_effect = Forbidden("Access denied")
+    elif gate == "project":
+        endpoint.store.project.side_effect = Forbidden("Access denied")
+    consumed = []
+
+    async def receive():
+        consumed.append(True)
+        raise AssertionError("Denied Git handler consumed the upload body")
+
+    request = Request(
+        {
+            "type": "http",
+            "method": "POST",
+            "path": f"/git/{uid(200)}/git-receive-pack",
+            "query_string": b"",
+            "headers": [(b"authorization", f"Bearer {token}".encode())],
+        },
+        receive=receive,
+    )
+    route = next(route for route in endpoint.client.app.routes if route.path == "/git/{project_id}/{tail:path}")
+    with pytest.raises(Forbidden):
+        asyncio.run(route.endpoint(uid(200), "git-receive-pack", request))
+    assert consumed == []
+    endpoint.repository.backend.assert_not_called()
+
+
+@pytest.mark.parametrize("overflow", [False, True])
+def test_chunked_git_input_keeps_actual_service_capacity_and_never_executes_on_overflow(git_endpoint, overflow):
+    from codehub.repository import MAX_GIT_BYTES
+
+    endpoint = git_endpoint
+
+    async def send():
+        async def chunks():
+            chunk = b"g" * (1024 * 1024)
+            for _ in range(MAX_GIT_BYTES // len(chunk)):
+                yield chunk
+            if overflow:
+                yield b"!"
+
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=endpoint.client.app), base_url="http://repository"
+        ) as client:
+            return await client.post(
+                f"/git/{uid(200)}/git-upload-pack", content=chunks(), headers={"Authorization": "Bearer customer-token"}
+            )
+
+    response = asyncio.run(send())
+    if overflow:
+        assert response.status_code == 422 and response.json() == {"detail": "Git input exceeds service capacity"}
+        endpoint.repository.backend.assert_not_called()
+    else:
+        assert response.status_code == 200 and response.content == b"git-packet"
+        body = endpoint.repository.backend.call_args.kwargs["body"]
+        assert len(body) == MAX_GIT_BYTES and body[:1] == body[-1:] == b"g"

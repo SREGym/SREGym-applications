@@ -40,7 +40,7 @@ spec:
     spec:
       automountServiceAccountToken: false
       securityContext: {runAsNonRoot: true, runAsUser: 101, runAsGroup: 101, fsGroup: 101, seccompProfile: {type: RuntimeDefault}}
-      {{- include "codehub.placement" . | nindent 6 }}
+      {{- include "codehub.placement" (dict "root" . "component" "gateway") | nindent 6 }}
       containers:
         - name: gateway
           image: {{ .Values.gateway.image | quote }}

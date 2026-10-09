@@ -19,7 +19,7 @@ spec:
       automountServiceAccountToken: false
       securityContext:
         {{- include "codehub.security" $root | nindent 8 }}
-      {{- include "codehub.placement" $root | nindent 6 }}
+      {{- include "codehub.placement" (dict "root" $root "component" $role) | nindent 6 }}
       containers:
         - name: {{ $role }}
           image: {{ $root.Values.image.repository | quote }}
@@ -30,7 +30,12 @@ spec:
             {{- include "codehub.env" $root | nindent 12 }}
           ports: [{name: http, containerPort: 8080}]
           startupProbe: {httpGet: {path: /healthz, port: http}, periodSeconds: 2, failureThreshold: 90}
-          readinessProbe: {httpGet: {path: /readyz, port: http}, periodSeconds: 3}
+          readinessProbe:
+            httpGet: {path: /readyz, port: http}
+            periodSeconds: 3
+            {{- if eq $role "repository" }}
+            timeoutSeconds: 5
+            {{- end }}
           livenessProbe: {httpGet: {path: /healthz, port: http}, periodSeconds: 10}
           resources:
             {{- toYaml $service.resources | nindent 12 }}

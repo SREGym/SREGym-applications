@@ -8,13 +8,19 @@ codehub.local/deployment: {{ .Values.deploymentOwner | quote }}
 {{- end -}}
 {{- define "codehub.placement" -}}
 nodeSelector:
-  topology.kubernetes.io/region: {{ .Values.region }}
+  topology.kubernetes.io/region: {{ .root.Values.region }}
 topologySpreadConstraints:
   - maxSkew: 1
     topologyKey: kubernetes.io/hostname
     whenUnsatisfiable: DoNotSchedule
     labelSelector:
-      matchLabels: {app.kubernetes.io/name: codehub}
+      matchLabels:
+        app.kubernetes.io/name: codehub
+        app.kubernetes.io/instance: {{ .root.Release.Name }}
+        app.kubernetes.io/component: {{ .component }}
+        {{- if .group }}
+        database-group: {{ .group }}
+        {{- end }}
 {{- end -}}
 {{- define "codehub.security" -}}
 runAsNonRoot: true

@@ -38,6 +38,9 @@ kind: Deployment
 metadata: {name: topology}
 spec:
   replicas: 1
+  # One process owns the persistent promotion state. Replacement must not run
+  # a second writer against the same volume or need a temporary surge pod.
+  strategy: {type: Recreate}
   selector: {matchLabels: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: topology}}
   template:
     metadata:
@@ -48,7 +51,7 @@ spec:
       serviceAccountName: topology
       securityContext:
         {{- include "codehub.security" . | nindent 8 }}
-      {{- include "codehub.placement" . | nindent 6 }}
+      {{- include "codehub.placement" (dict "root" . "component" "topology") | nindent 6 }}
       containers:
         - name: topology
           image: {{ .Values.image.repository | quote }}

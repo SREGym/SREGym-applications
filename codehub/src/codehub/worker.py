@@ -97,7 +97,12 @@ class Worker:
                     while not self.stop.is_set():
                         groups = {"group-0": self.storage_override} if self.storage_override else self.router.groups()
                         for group, storage in groups.items():
-                            for effect_id in storage.pending(limit=100):
+                            try:
+                                pending = storage.pending(limit=100)
+                            except Exception as exc:
+                                logging.warning("Database group %s outbox unavailable: %s", group, type(exc).__name__)
+                                continue
+                            for effect_id in pending:
                                 body = json.dumps(
                                     {"group": group, "effect_id": effect_id}, separators=(",", ":")
                                 ).encode()
@@ -110,7 +115,13 @@ class Worker:
                                         delivery_mode=2, message_id=effect_id, content_type="application/json"
                                     ),
                                 )
-                                storage.publish_confirmed(effect_id)
+                                try:
+                                    storage.publish_confirmed(effect_id)
+                                except Exception as exc:
+                                    logging.warning(
+                                        "Database group %s publish receipt unavailable: %s", group, type(exc).__name__
+                                    )
+                                    break
                         connection.process_data_events(time_limit=1)
                         self.stop.wait(0.25)
                 finally:

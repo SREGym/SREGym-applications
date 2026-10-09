@@ -180,3 +180,41 @@ def test_bounded_entity_lookup_preserves_real_sql_authorization_and_single_read_
         storage.get_entities(other_tenant, [other_project], owner)
     with pytest.raises(DomainError):
         storage.get_entities(tenant, [issue, issue], owner)
+
+
+
+def test_unavailable_database_group_does_not_block_other_groups_acknowledged_git(storage, tmp_path):
+    import subprocess
+    from types import SimpleNamespace
+
+    from codehub.repository import Repository
+    from codehub.repository_sync import RepositorySynchronizer
+
+    owner, tenant, project = setup_project(storage)
+    source = tmp_path / "source"
+    source.mkdir()
+    def git(path, *arguments):
+        return subprocess.check_output(["git", "-c", "commit.gpgsign=false", "-C", str(path), *arguments],
+                                       stderr=subprocess.DEVNULL, text=True, timeout=10).strip()
+    git(source, "init", "-b", "main")
+    git(source, "config", "user.name", "Morgan Lee")
+    git(source, "config", "user.email", "morgan@example.test")
+    (source / "routing.py").write_text("selected_region = 'us-west'\n")
+    git(source, "add", "routing.py")
+    git(source, "commit", "-m", "Record service routing")
+    sha = git(source, "rev-parse", "HEAD")
+    upstream = Repository(tmp_path / "upstream")
+    git(source, "push", str(upstream.ensure(project)), "HEAD:refs/heads/main")
+    operation = Operation(str(uuid4()), tenant, str(uuid4()), project, 1, "repository.push",
+                          {"ref":"refs/heads/main", "commit_sha":sha})
+    receipt = storage.accept(operation, owner)
+    assert receipt["event_id"] == operation.event_id
+    # Actual refused native TCP SQL connection, not an in-memory fake database.
+    failed = MySQLStorage(replace(storage.settings, mysql_host="127.0.0.1", mysql_port=1, mysql_read_host=None))
+    router = SimpleNamespace(groups=lambda: {"group-0":failed, "group-1":storage})
+    replica = Repository(tmp_path / "replica")
+    git(replica.ensure(project), "fetch", str(upstream.ensure(project)), "+refs/heads/*:refs/remotes/upstream/*")
+    synchronizer = RepositorySynchronizer(router, replica, ())
+    synchronizer.synchronize()
+    assert replica.ref(project, "refs/heads/main") == sha
+    assert replica.commit(project, sha)["commit_sha"] == sha

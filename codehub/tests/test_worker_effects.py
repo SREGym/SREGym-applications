@@ -1,13 +1,40 @@
 """Failure semantics at the durable worker's outbound-service boundary."""
 
 from types import SimpleNamespace
+import threading
 from uuid import uuid4
 
 import httpx
 import pytest
 
 from codehub.search import SearchIndex
-from codehub.worker import EffectProcessor
+from codehub.worker import EffectProcessor, Worker
+
+
+def test_unavailable_group_does_not_stop_other_group_outbox_publication():
+    worker = object.__new__(Worker)
+    worker.stop = threading.Event()
+    worker.storage_override = None
+    worker.queue = "work"
+    published, confirmed = [], []
+
+    def unavailable(**_kwargs):
+        raise RuntimeError("database unavailable")
+
+    worker.router = SimpleNamespace(
+        groups=lambda: {
+            "group-0": SimpleNamespace(pending=unavailable),
+            "group-1": SimpleNamespace(pending=lambda **_kwargs: ["a" * 64], publish_confirmed=confirmed.append),
+        }
+    )
+    channel = SimpleNamespace(confirm_delivery=lambda: None, basic_publish=lambda **kwargs: published.append(kwargs))
+    connection = SimpleNamespace(
+        is_open=True, process_data_events=lambda **_kwargs: worker.stop.set(), close=lambda: None
+    )
+    worker.broker = lambda: (connection, channel)
+    worker.publish_loop()
+    assert confirmed == ["a" * 64]
+    assert len(published) == 1 and b'"group":"group-1"' in published[0]["body"]
 
 
 class OutboxObservation:

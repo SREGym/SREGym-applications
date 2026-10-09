@@ -92,7 +92,9 @@ def test_real_probe_threshold_and_recent_safe_lag_gate_promotion(manager):
     assert instance.state["promoted"]
     assert routes == [("candidate", "mysql-writer")]
     assert ("candidate", "STOP REPLICA") in statements
-    assert ("candidate", "SET GLOBAL super_read_only=OFF") in statements
+    assert ("candidate", "SET PERSIST super_read_only=OFF") in statements
+    assert ("candidate", "SET PERSIST read_only=OFF") in statements
+    assert ("candidate", "SET PERSIST_ONLY skip_replica_start=ON") in statements
 
 
 @pytest.mark.parametrize("reason", ["stale", "lagging", "sql_error", "candidate_unreachable"])

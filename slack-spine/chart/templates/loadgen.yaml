@@ -105,6 +105,20 @@ data:
   profiles.yaml: {{ .Values.loadgen.profilesYaml | quote }}
 ---
 {{- end }}
+{{- if $.Values.sregym.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loadgen-session
+  labels:
+    {{- include "slack.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: loadgen
+{{- with $.Values.sregym.loadgenLabels }}{{ toYaml . | nindent 4 }}{{- end }}
+data:
+  entrypoint.py: |
+{{ .Files.Get "files/loadgen-session.py" | indent 4 }}
+---
+{{- end }}
 {{- if .Values.gradingHarness.verifierEvidence.persistent }}
 apiVersion: v1
 kind: ConfigMap
@@ -365,7 +379,9 @@ spec:
         - name: loadgen
           image: {{ .Values.images.loadgen | quote }}
           imagePullPolicy: {{ .Values.global.imagePullPolicy }}
-          {{- if .Values.gradingHarness.verifierEvidence.persistent }}
+          {{- if $.Values.sregym.enabled }}
+          command: ["python3", "/opt/loadgen-session/entrypoint.py"]
+          {{- else if .Values.gradingHarness.verifierEvidence.persistent }}
           # v13 predates durable episode resume. This compatibility entrypoint
           # uses only the sidecar module already installed in that pinned image,
           # so the evidence fix is deployable without publishing a new image.
@@ -479,6 +495,11 @@ spec:
           volumeMounts:
             - name: grader
               mountPath: {{ .Values.loadgen.graderDir }}
+            {{- if $.Values.sregym.enabled }}
+            - name: loadgen-session
+              mountPath: /opt/loadgen-session
+              readOnly: true
+            {{- end }}
             - name: grader-access
               mountPath: /run/grader-access
               readOnly: true
@@ -529,6 +550,12 @@ spec:
           secret:
             secretName: loadgen-grader-access
             defaultMode: 0444
+        {{- if $.Values.sregym.enabled }}
+        - name: loadgen-session
+          configMap:
+            name: loadgen-session
+            defaultMode: 0444
+        {{- end }}
         {{- if .Values.gradingHarness.verifierEvidence.persistent }}
         - name: verifier-evidence-entrypoint
           configMap:

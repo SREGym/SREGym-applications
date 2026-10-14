@@ -1,5 +1,8 @@
 # substrates/frappe/chart — Frappe substrate Helm chart
 
+This is upstream chart documentation. Its paths and phase names refer to the
+original sre-world repository. See the [Frappe README](../README.md) for SREGym integration.
+
 Wraps the vendored upstream `frappe/helm` v8.0.65 (at `charts/erpnext/`) with
 the SRE-World-substrate additions: operator-shell foothold (`main`),
 out-of-band loadgen with protected evidence collection, observability MCP + Prometheus/Loki

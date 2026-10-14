@@ -11,7 +11,7 @@ Its configuration is `sregym/service/apps/saleor/values.yaml` in the SREGym repo
 The runner completes the migration and data-seeding Job before it starts the API and worker.
 A direct Helm install does not reproduce this sequence.
 The application URLs use the `saleor` namespace.
-The pinned images require AMD64. The chart uses shared ReadWriteOnce volumes.
+SREGym supplies pinned Linux/AMD64 and Linux/ARM64 images. The chart uses shared ReadWriteOnce volumes.
 
 With `sregym.enabled=true`, the chart provides an operator toolbox and workload hooks instead of the original agent harness.
 SREGym supplies observability and grading.

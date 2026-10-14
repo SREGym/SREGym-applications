@@ -12,7 +12,7 @@ Repair tools include the MariaDB client, Desk API, and durable queue configurati
 SREGym owns deployment and workload startup.
 Its configuration is `sregym/service/apps/frappe/values.yaml` in the SREGym repository.
 The first deployment creates the site before client traffic starts.
-The pinned images require AMD64. The chart uses shared ReadWriteOnce volumes.
+SREGym supplies pinned Linux/AMD64 and Linux/ARM64 images. The chart uses shared ReadWriteOnce volumes.
 
 With `sregym.enabled=true`, the chart provides an operator toolbox and workload hooks instead of the original agent harness.
 SREGym supplies observability and grading.

@@ -11,7 +11,8 @@ The database maintenance API is `/v1/maintenance` on `db-maintenance:8081`.
 
 SREGym owns deployment and workload startup.
 Its configuration is `sregym/service/apps/slack_spine/values.yaml` in the SREGym repository.
-The pinned images require AMD64. The application contains about 40 pods and uses shared ReadWriteOnce volumes.
+SREGym supplies pinned Linux/AMD64 and Linux/ARM64 images.
+The application contains about 40 pods and uses shared ReadWriteOnce volumes.
 
 With `sregym.enabled=true`, the chart provides an operator toolbox and workload hooks instead of the original agent harness.
 SREGym supplies observability and grading.

@@ -537,7 +537,7 @@ spec:
               containerPort: 9121
           readinessProbe:
             httpGet:
-              path: /metrics
+              path: /health
               port: http
             initialDelaySeconds: 5
             periodSeconds: 10
@@ -591,7 +591,7 @@ spec:
               containerPort: 9121
           readinessProbe:
             httpGet:
-              path: /metrics
+              path: /health
               port: http
             initialDelaySeconds: 5
             periodSeconds: 10

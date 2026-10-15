@@ -1,0 +1,6 @@
+apiVersion: v2
+name: agentic-retry-platform
+description: Autonomous Agentic Retry Platform with multi-stage reasoning, PgBouncer pooling, Redis workflow backlog, and tiered retries
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

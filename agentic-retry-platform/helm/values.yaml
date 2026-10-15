@@ -1,0 +1,93 @@
+# Default values for agentic-retry-platform.
+
+image:
+  repository: python
+  pullPolicy: IfNotPresent
+  tag: "3.11-slim"
+
+agentOrchestrator:
+  # Metrics are scraped through a Service port-forward. Keep this at one until
+  # the benchmark has a replica-aware Prometheus aggregation path.
+  replicaCount: 1
+  port: 8000
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+toolGateway:
+  replicaCount: 1
+  port: 8001
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+dataApi:
+  replicaCount: 1
+  port: 8002
+  controlPort: 8003
+  concurrencyLimit: 25
+  queueCapacity: 40
+  maxRequestHandlers: 64
+  normalLatency: 0.10
+  faultLatency: 1.50
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+redis:
+  image:
+    repository: redis
+    pullPolicy: IfNotPresent
+    tag: "7.2-alpine"
+  port: 6379
+
+postgres:
+  image:
+    repository: postgres
+    pullPolicy: IfNotPresent
+    tag: "16-alpine"
+  port: 5432
+  db: agentic_db
+  user: postgres
+  password: postgres
+
+pgbouncer:
+  image:
+    repository: edoburu/pgbouncer
+    pullPolicy: IfNotPresent
+    tag: "1.22.0-p0"
+  # edoburu/pgbouncer listens on PostgreSQL's standard port; the Kubernetes
+  # Service name, rather than a non-default container port, distinguishes it.
+  port: 5432
+  poolMode: transaction
+  defaultPoolSize: 25
+  maxClientConn: 200
+
+# Canonical single source of truth for runtime agentic retry policy
+policy:
+  workflow:
+    timeoutMs: 1500
+    maxAttempts: 3
+    maxInflight: 100
+    cancelChildrenOnTimeout: false
+  tool:
+    timeoutMs: 1000
+    maxAttempts: 2
+  transport:
+    timeoutMs: 600
+    maxAttempts: 2
+  retryBudget:
+    enabled: false
+    maxPhysicalAttemptsPerWorkflow: 4

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentic-retry-scripts
+  labels:
+    app.kubernetes.io/name: agentic-retry-platform
+    app.kubernetes.io/component: scripts
+data:
+  agent-orchestrator-app.py: |-
+{{ .Files.Get "files/agent-orchestrator-app.py" | indent 4 }}
+  tool-gateway-app.py: |-
+{{ .Files.Get "files/tool-gateway-app.py" | indent 4 }}
+  data-api-app.py: |-
+{{ .Files.Get "files/data-api-app.py" | indent 4 }}
+  pg_wire.py: |-
+{{ .Files.Get "files/pg_wire.py" | indent 4 }}
+  data_state.py: |-
+{{ .Files.Get "files/data_state.py" | indent 4 }}
+  control_server.py: |-
+{{ .Files.Get "files/control_server.py" | indent 4 }}
+  data_server.py: |-
+{{ .Files.Get "files/data_server.py" | indent 4 }}
+

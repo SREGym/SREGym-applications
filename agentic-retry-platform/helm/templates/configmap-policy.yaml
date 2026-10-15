@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentic-retry-policy
+  labels:
+    app.kubernetes.io/name: agentic-retry-platform
+    app.kubernetes.io/component: policy
+data:
+  policy.json: |
+    {
+      "workflow": {
+        "timeout_ms": {{ .Values.policy.workflow.timeoutMs }},
+        "max_attempts": {{ .Values.policy.workflow.maxAttempts }},
+        "max_inflight": {{ .Values.policy.workflow.maxInflight }},
+        "cancel_children_on_timeout": {{ .Values.policy.workflow.cancelChildrenOnTimeout }}
+      },
+      "tool": {
+        "timeout_ms": {{ .Values.policy.tool.timeoutMs }},
+        "max_attempts": {{ .Values.policy.tool.maxAttempts }}
+      },
+      "transport": {
+        "timeout_ms": {{ .Values.policy.transport.timeoutMs }},
+        "max_attempts": {{ .Values.policy.transport.maxAttempts }}
+      },
+      "retry_budget": {
+        "enabled": {{ .Values.policy.retryBudget.enabled }},
+        "max_physical_attempts_per_workflow": {{ .Values.policy.retryBudget.maxPhysicalAttemptsPerWorkflow }}
+      }
+    }

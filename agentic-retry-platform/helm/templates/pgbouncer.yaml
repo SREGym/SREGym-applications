@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgbouncer
+  labels:
+    app: pgbouncer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgbouncer
+  template:
+    metadata:
+      labels:
+        app: pgbouncer
+    spec:
+      containers:
+        - name: pgbouncer
+          image: "{{ .Values.pgbouncer.image.repository }}:{{ .Values.pgbouncer.image.tag }}"
+          imagePullPolicy: {{ .Values.pgbouncer.image.pullPolicy }}
+          env:
+            - name: DB_USER
+              value: "{{ .Values.postgres.user }}"
+            - name: DB_PASSWORD
+              value: "{{ .Values.postgres.password }}"
+            - name: DB_HOST
+              value: "postgres"
+            - name: DB_PORT
+              value: "{{ .Values.postgres.port }}"
+            - name: DB_NAME
+              value: "{{ .Values.postgres.db }}"
+            - name: POOL_MODE
+              value: "{{ .Values.pgbouncer.poolMode }}"
+            - name: DEFAULT_POOL_SIZE
+              value: "{{ .Values.pgbouncer.defaultPoolSize }}"
+            - name: MAX_CLIENT_CONN
+              value: "{{ .Values.pgbouncer.maxClientConn }}"
+            - name: AUTH_TYPE
+              value: "trust"
+          ports:
+            - containerPort: {{ .Values.pgbouncer.port }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.pgbouncer.port }}
+            initialDelaySeconds: 2
+            periodSeconds: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgbouncer
+  labels:
+    app: pgbouncer
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.pgbouncer.port }}
+      targetPort: {{ .Values.pgbouncer.port }}
+      name: pgbouncer
+  selector:
+    app: pgbouncer

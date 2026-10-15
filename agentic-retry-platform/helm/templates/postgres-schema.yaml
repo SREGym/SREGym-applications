@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentic-retry-postgres-schema
+  labels:
+    app.kubernetes.io/name: agentic-retry-platform
+    app.kubernetes.io/component: database
+data:
+  001-schema.sql: |
+    CREATE TABLE IF NOT EXISTS knowledge (
+      id INTEGER PRIMARY KEY,
+      key TEXT NOT NULL,
+      value TEXT NOT NULL
+    );
+    INSERT INTO knowledge (id, key, value)
+    VALUES (1, 'agentic-state', 'healthy')
+    ON CONFLICT (id) DO NOTHING;

@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tool-gateway
+  labels:
+    app: tool-gateway
+spec:
+  replicas: {{ .Values.toolGateway.replicaCount }}
+  selector:
+    matchLabels:
+      app: tool-gateway
+  template:
+    metadata:
+      labels:
+        app: tool-gateway
+    spec:
+      containers:
+        - name: tool-gateway
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python", "/app/tool-gateway/tool-gateway-app.py"]
+          ports:
+            - containerPort: {{ .Values.toolGateway.port }}
+          env:
+            - name: PORT
+              value: "{{ .Values.toolGateway.port }}"
+            - name: DATA_API_URL
+              value: "http://data-api:{{ .Values.dataApi.port }}/data/query"
+            - name: DATA_API_CANCEL_URL
+              value: "http://data-api:{{ .Values.dataApi.controlPort | default 8003 }}/data/cancel"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "{{ .Values.redis.port }}"
+            - name: POLICY_PATH
+              value: "/etc/agent-policy/policy.json"
+          volumeMounts:
+            - name: code-volume
+              mountPath: /app/tool-gateway
+            - name: policy-volume
+              mountPath: /etc/agent-policy
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: {{ .Values.toolGateway.port }}
+            initialDelaySeconds: 2
+            periodSeconds: 3
+            failureThreshold: 10
+      volumes:
+        - name: code-volume
+          configMap:
+            name: agentic-retry-scripts
+        - name: policy-volume
+          configMap:
+            name: agentic-retry-policy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tool-gateway
+  labels:
+    app: tool-gateway
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.toolGateway.port }}
+      targetPort: {{ .Values.toolGateway.port }}
+      name: http
+  selector:
+    app: tool-gateway

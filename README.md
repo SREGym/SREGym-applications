@@ -11,4 +11,4 @@ SREGym includes a diverse set of microservice applications in the [SREGym-applic
 - **saleor**: Saleor headless e-commerce (Django/GraphQL API, Celery, PostgreSQL, Valkey, RabbitMQ), ported from Incident Arena
 - **slack-spine**: Polyglot Slack clone (TypeScript roles, Go real-time services, Redpanda workers, PostgreSQL, Redis, MinIO), ported from Incident Arena
 - **socialNetwork**: Social network platform with microservices for posts, timelines, and user relationships
-- **train-ticket**: Large-scale train ticket booking system with 41 microservices in Java, Node.js, Python, and Go
+- **train-ticket**: Large-scale train ticket booking system with 41 microservices in Java, Node.js, Python, and Go- **agentic-rag-platform**: Autonomous Agentic RAG Platform with multi-stage reasoning and vector retrieval (embedded application)

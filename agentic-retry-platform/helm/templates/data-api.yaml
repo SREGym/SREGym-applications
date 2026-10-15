@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-api
+  labels:
+    app: data-api
+spec:
+  replicas: {{ .Values.dataApi.replicaCount }}
+  selector:
+    matchLabels:
+      app: data-api
+  template:
+    metadata:
+      labels:
+        app: data-api
+    spec:
+      containers:
+        - name: data-api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python", "/app/data-api/data-api-app.py"]
+          ports:
+            - containerPort: {{ .Values.dataApi.port }}
+              name: data
+            - containerPort: {{ .Values.dataApi.controlPort | default 8003 }}
+              name: control
+          env:
+            - name: PORT
+              value: "{{ .Values.dataApi.port }}"
+            - name: CONTROL_PORT
+              value: "{{ .Values.dataApi.controlPort | default 8003 }}"
+            - name: CONCURRENCY_LIMIT
+              value: "{{ .Values.dataApi.concurrencyLimit }}"
+            - name: QUEUE_CAPACITY
+              value: "{{ .Values.dataApi.queueCapacity }}"
+            - name: MAX_REQUEST_HANDLERS
+              value: "{{ .Values.dataApi.maxRequestHandlers | default 64 }}"
+            - name: NORMAL_LATENCY
+              value: "{{ .Values.dataApi.normalLatency }}"
+            - name: FAULT_LATENCY
+              value: "{{ .Values.dataApi.faultLatency }}"
+            - name: PGBOUNCER_HOST
+              value: "pgbouncer"
+            - name: PGBOUNCER_PORT
+              value: "{{ .Values.pgbouncer.port }}"
+            - name: POSTGRES_HOST
+              value: "postgres"
+            - name: POSTGRES_PORT
+              value: "{{ .Values.postgres.port }}"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "{{ .Values.redis.port }}"
+            - name: POLICY_PATH
+              value: "/etc/agent-policy/policy.json"
+          volumeMounts:
+            - name: code-volume
+              mountPath: /app/data-api
+            - name: policy-volume
+              mountPath: /etc/agent-policy
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: {{ .Values.dataApi.controlPort | default 8003 }}
+            initialDelaySeconds: 2
+            periodSeconds: 3
+            failureThreshold: 10
+      volumes:
+        - name: code-volume
+          configMap:
+            name: agentic-retry-scripts
+        - name: policy-volume
+          configMap:
+            name: agentic-retry-policy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-api
+  labels:
+    app: data-api
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.dataApi.port }}
+      targetPort: {{ .Values.dataApi.port }}
+      name: data
+    - port: {{ .Values.dataApi.controlPort | default 8003 }}
+      targetPort: {{ .Values.dataApi.controlPort | default 8003 }}
+      name: control
+  selector:
+    app: data-api

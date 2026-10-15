@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-orchestrator
+  labels:
+    app: agent-orchestrator
+spec:
+  replicas: {{ .Values.agentOrchestrator.replicaCount }}
+  selector:
+    matchLabels:
+      app: agent-orchestrator
+  template:
+    metadata:
+      labels:
+        app: agent-orchestrator
+    spec:
+      containers:
+        - name: agent-orchestrator
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python", "/app/agent-orchestrator/agent-orchestrator-app.py"]
+          ports:
+            - containerPort: {{ .Values.agentOrchestrator.port }}
+          env:
+            - name: PORT
+              value: "{{ .Values.agentOrchestrator.port }}"
+            - name: TOOL_GATEWAY_URL
+              value: "http://tool-gateway:{{ .Values.toolGateway.port }}/tools/execute"
+            - name: TOOL_GATEWAY_CANCEL_URL
+              value: "http://tool-gateway:{{ .Values.toolGateway.port }}/tools/cancel"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "{{ .Values.redis.port }}"
+            - name: POLICY_PATH
+              value: "/etc/agent-policy/policy.json"
+          volumeMounts:
+            - name: code-volume
+              mountPath: /app/agent-orchestrator
+            - name: policy-volume
+              mountPath: /etc/agent-policy
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: {{ .Values.agentOrchestrator.port }}
+            initialDelaySeconds: 2
+            periodSeconds: 3
+            failureThreshold: 10
+      volumes:
+        - name: code-volume
+          configMap:
+            name: agentic-retry-scripts
+        - name: policy-volume
+          configMap:
+            name: agentic-retry-policy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-orchestrator
+  labels:
+    app: agent-orchestrator
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.agentOrchestrator.port }}
+      targetPort: {{ .Values.agentOrchestrator.port }}
+      name: http
+  selector:
+    app: agent-orchestrator

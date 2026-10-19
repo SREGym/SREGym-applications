@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "resolved_at": "2026-10-09",
+  "images": {
+    "python": {
+      "reference": "docker.io/library/python:3.12.12-slim-bookworm@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c",
+      "linux_amd64": "sha256:2986c55feb36e6cae00fa1fefb454283e4b33f35e75ff8bdd123b134130be301"
+    },
+    "mysql": {
+      "reference": "docker.io/library/mysql:8.4.6@sha256:869218921e61d6c3c89820955d63cca42971f0e3e6c1e2792247bbd944ebc6e9",
+      "linux_amd64": "sha256:c296d65ee6ab3ce2f608c1d1b2bdd3c08b087a5834101d76a6db2e00875216cc"
+    },
+    "rabbitmq": {
+      "reference": "docker.io/library/rabbitmq:4.1.8-management@sha256:19c5ee40801d36eaa46020c9e2ff802c4ef7e74839a00b0f8bd43f935f845778",
+      "linux_amd64": "sha256:5b36acefa30cf0ed99bfbb1447275ff7e9b8a4ba8439668df653786b80d598cb"
+    },
+    "telemetry": {
+      "reference": "docker.io/otel/opentelemetry-collector-contrib:0.121.0@sha256:789689988e379c58ac12b07718dbcf4b23c2214bd804173c1c77af346d381c15",
+      "linux_amd64": "sha256:8314455bca10c8d9025ef97ef2bade9b5f09d92835aee249a0cc3e0000fa5ffc"
+    },
+    "gateway": {
+      "reference": "docker.io/library/nginx:1.28.0-alpine@sha256:30f1c0d78e0ad60901648be663a710bdadf19e4c10ac6782c235200619158284",
+      "linux_amd64": "sha256:09ab424a8c788f8d0fe3a64429f6d19dfa526885c8609b748d0943a75dcb9f8c"
+    }
+  },
+  "application_resolution": "Record the built application content ID and complete installed package inventory before qualification."
+}

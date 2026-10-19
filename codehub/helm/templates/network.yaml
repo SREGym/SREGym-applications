@@ -1,0 +1,51 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: regional-services
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: codehub}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: {matchLabels: {app.kubernetes.io/name: codehub}}
+          podSelector: {matchLabels: {app.kubernetes.io/name: codehub}}
+        {{- range .Values.clientCIDRs }}
+        - ipBlock: {cidr: {{ . | quote }}}
+        {{- end }}
+    {{- range .Values.observability.namespaces }}
+    - from:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: {{ . }}}}
+      ports: [{protocol: TCP, port: 8080}, {protocol: TCP, port: 8889}, {protocol: TCP, port: 15692}]
+    {{- end }}
+  egress:
+    - to:
+        - namespaceSelector: {matchLabels: {app.kubernetes.io/name: codehub}}
+          podSelector: {matchLabels: {app.kubernetes.io/name: codehub}}
+    - to:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+      ports:
+        - {protocol: UDP, port: 53}
+        - {protocol: TCP, port: 53}
+    {{- range .Values.observability.namespaces }}
+    - to:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: {{ . }}}}
+    {{- end }}
+    {{- range .Values.webhookEgress }}
+    - to: [{ipBlock: {cidr: {{ .cidr | quote }}}}]
+      ports: [{protocol: TCP, port: {{ .port }}}]
+    {{- end }}
+{{- if .Values.databaseLinks }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: database-link-egress}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: codehub}}
+  policyTypes: [Egress]
+  egress:
+    - to: [{ipBlock: {cidr: "172.17.0.1/32"}}]
+      ports:
+        {{- range .Values.databaseLinks }}
+        - {protocol: TCP, port: {{ .port }}}
+        {{- end }}
+{{- end }}

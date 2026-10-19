@@ -1,0 +1,116 @@
+{{- $cpu := .Values.queue.resources.limits.cpu | toString }}
+{{- $cores := float64 $cpu }}
+{{- if hasSuffix "m" $cpu }}
+{{- $cores = divf (float64 (trimSuffix "m" $cpu)) 1000 }}
+{{- end }}
+{{- $schedulers := max 1 (int (ceil $cores)) }}
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: queue-config}
+data:
+  enabled_plugins: "[rabbitmq_management,rabbitmq_prometheus]."
+  rabbitmq.conf: |
+    default_queue_type = quorum
+    cluster_formation.peer_discovery_backend = classic_config
+    cluster_formation.classic_config.nodes.1 = rabbit@queue-0.queue-headless.{{ .Release.Namespace }}.svc.cluster.local
+    cluster_formation.classic_config.nodes.2 = rabbit@queue-1.queue-headless.{{ .Release.Namespace }}.svc.cluster.local
+    cluster_formation.classic_config.nodes.3 = rabbit@queue-2.queue-headless.{{ .Release.Namespace }}.svc.cluster.local
+    cluster_partition_handling = pause_minority
+    disk_free_limit.absolute = 64MB
+    vm_memory_high_watermark.relative = 0.6
+    log.console = true
+    management.tcp.port = 15672
+    prometheus.tcp.port = 15692
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: {name: queue}
+spec:
+  serviceName: queue-headless
+  replicas: 3
+  podManagementPolicy: Parallel
+  selector: {matchLabels: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: queue}}
+  template:
+    metadata:
+      labels:
+        {{- include "codehub.labels" . | nindent 8 }}
+        app.kubernetes.io/component: queue
+      annotations: {prometheus.io/scrape: "true", prometheus.io/port: "15692"}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 999, runAsGroup: 999, fsGroup: 999, seccompProfile: {type: RuntimeDefault}}
+      {{- include "codehub.placement" (dict "root" . "component" "queue") | nindent 6 }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector: {matchLabels: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: queue}}
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: queue
+          image: {{ .Values.queue.image | quote }}
+          securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+          env:
+            - {name: POD_NAME, valueFrom: {fieldRef: {fieldPath: metadata.name}}}
+            - {name: POD_NAMESPACE, valueFrom: {fieldRef: {fieldPath: metadata.namespace}}}
+            - {name: RABBITMQ_NODENAME, value: "rabbit@$(POD_NAME).queue-headless.$(POD_NAMESPACE).svc.cluster.local"}
+            - {name: RABBITMQ_USE_LONGNAME, value: "true"}
+            - {name: RABBITMQ_CONFIG_FILE, value: /etc/codehub/rabbitmq}
+            - {name: RABBITMQ_ENABLED_PLUGINS_FILE, value: /etc/codehub/enabled_plugins}
+            - name: RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS
+              value: {{ printf "+S %d:%d +SDcpu 1:1 +SDio 1 +A 2" $schedulers $schedulers | quote }}
+            - {name: RABBITMQ_CTL_ERL_ARGS, value: "+S 1:1 +SDcpu 1:1 +SDio 1 +A 1"}
+            - {name: RABBITMQ_DEFAULT_USER, value: codehub}
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom: {secretKeyRef: {name: {{ .Values.credentialsSecret }}, key: broker-password}}
+            - name: RABBITMQ_ERLANG_COOKIE
+              valueFrom: {secretKeyRef: {name: {{ .Values.credentialsSecret }}, key: broker-cookie}}
+          ports:
+            - {name: amqp, containerPort: 5672}
+            - {name: epmd, containerPort: 4369}
+            - {name: distribution, containerPort: 25672}
+            - {name: management, containerPort: 15672}
+            - {name: metrics, containerPort: 15692}
+          startupProbe:
+            exec: {command: [rabbitmq-diagnostics, -q, --timeout, "10", ping]}
+            timeoutSeconds: 15
+            periodSeconds: 15
+            failureThreshold: 20
+          readinessProbe:
+            exec: {command: [rabbitmq-diagnostics, -q, --timeout, "8", check_running]}
+            timeoutSeconds: 10
+            periodSeconds: 15
+          resources:
+            {{- toYaml .Values.queue.resources | nindent 12 }}
+          volumeMounts:
+            - {name: data, mountPath: /var/lib/rabbitmq}
+            - {name: config, mountPath: /etc/codehub, readOnly: true}
+      volumes:
+        - {name: config, configMap: {name: queue-config}}
+  volumeClaimTemplates:
+    - metadata: {name: data}
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: {{ .Values.storageClass | quote }}
+        resources: {requests: {storage: {{ .Values.queue.storage | quote }}}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: queue-headless}
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: queue}
+  ports:
+    - {name: amqp, port: 5672, targetPort: amqp}
+    - {name: epmd, port: 4369, targetPort: epmd}
+    - {name: distribution, port: 25672, targetPort: distribution}
+    - {name: metrics, port: 15692, targetPort: metrics}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: queue}
+spec:
+  selector: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: queue}
+  ports:
+    - {name: amqp, port: 5672, targetPort: amqp}
+    - {name: management, port: 15672, targetPort: management}

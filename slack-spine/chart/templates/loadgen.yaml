@@ -380,7 +380,7 @@ spec:
           image: {{ .Values.images.loadgen | quote }}
           imagePullPolicy: {{ .Values.global.imagePullPolicy }}
           {{- if $.Values.sregym.enabled }}
-          command: ["python3", "/opt/loadgen-session/entrypoint.py"]
+          command: ["python3", "/opt/loadgen-session/entrypoint.py", {{ .Values.sregym.loadgenProgram | default "loadgen_sidecar.py" | quote }}]
           {{- else if .Values.gradingHarness.verifierEvidence.persistent }}
           # v13 predates durable episode resume. This compatibility entrypoint
           # uses only the sidecar module already installed in that pinned image,

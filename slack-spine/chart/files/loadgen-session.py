@@ -20,4 +20,4 @@ def start_session() -> Path:
 
 if __name__ == "__main__":
     start_session()
-    os.execv(sys.executable, [sys.executable, "loadgen_sidecar.py"])
+    os.execv(sys.executable, [sys.executable, *(sys.argv[1:] or ["loadgen_sidecar.py"])])

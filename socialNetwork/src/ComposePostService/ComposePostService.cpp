@@ -4,9 +4,6 @@
 #include <thrift/transport/TBufferTransports.h>
 #include <thrift/transport/TServerSocket.h>
 
-#include <opentelemetry/logs/provider.h>
-#include <opentelemetry/context/runtime_context.h>
-
 #include "../utils.h"
 #include "../utils_thrift.h"
 #include "ComposePostHandler.h"
@@ -23,15 +20,6 @@ int main(int argc, char *argv[]) {
   signal(SIGINT, sigintHandler);
   init_logger();
   SetUpTracer("config/jaeger-config.yml", "compose-post-service");
-
-  // Set up otel tracer
-  SetUpOpenTelemetryTracer("compose-post-service");
-  SetUpOpenTelemetryLogger("compose-post-service");
-  
-  auto logger = opentelemetry::logs::Provider::GetLoggerProvider()->GetLogger(
-        "compose-post-service");
-  auto tracer = opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("compose-post-service");
-  auto ctx  = tracer->GetCurrentSpan()->GetContext();
 
   json config_json;
   if (load_config_file("config/service-config.json", &config_json) != 0) {
@@ -120,7 +108,5 @@ int main(int argc, char *argv[]) {
       std::make_shared<TFramedTransportFactory>(),
       std::make_shared<TBinaryProtocolFactory>());
   LOG(info) << "Starting the compose-post-service server ...";
-  logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, "Starting the compose-post-service server ...", ctx.trace_id(), ctx.span_id(), ctx.trace_flags(),
-            opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
   server.serve();
 }

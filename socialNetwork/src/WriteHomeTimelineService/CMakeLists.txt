@@ -10,7 +10,6 @@ target_include_directories(
     /usr/local/include/jaegertracing
     /usr/local/include/cpp_redis
     ${LIBEVENT_INCLUDE_DIRS}
-    ${OPENTELEMETRY_CPP_INCLUDE_DIRS}
 )
 
 
@@ -28,7 +27,6 @@ target_link_libraries(
     ${LIBEVENT_LIBRARIES}
     /usr/local/lib/libcpp_redis.a
     /usr/local/lib/libtacopie.a
-    ${OPENTELEMETRY_CPP_LIBRARIES}
 )
 
 install(TARGETS WriteHomeTimelineService DESTINATION ./)

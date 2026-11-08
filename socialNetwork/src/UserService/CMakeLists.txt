@@ -13,7 +13,6 @@ target_include_directories(
     ${MONGOC_INCLUDE_DIRS}
     /usr/local/include/jwt
     /usr/local/include/jaegertracing
-    ${OPENTELEMETRY_CPP_INCLUDE_DIRS}
 )
 
 target_link_libraries(
@@ -28,7 +27,6 @@ target_link_libraries(
     Boost::log_setup
     jaegertracing
     OpenSSL::SSL
-    ${OPENTELEMETRY_CPP_LIBRARIES}
 )
 
 install(TARGETS UserService DESTINATION ./)

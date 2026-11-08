@@ -6,15 +6,6 @@
 #include <libmemcached/util.h>
 #include <mongoc.h>
 
-#include <opentelemetry/trace/provider.h>
-#include <opentelemetry/trace/tracer.h>
-#include <opentelemetry/trace/span.h>
-#include <opentelemetry/trace/scope.h>
-#include <opentelemetry/trace/span_startoptions.h>
-#include <opentelemetry/trace/propagation/http_trace_context.h>
-#include <opentelemetry/context/runtime_context.h>
-#include <opentelemetry/context/propagation/global_propagator.h>
-
 #include "../../gen-cpp/UserMentionService.h"
 #include "../../gen-cpp/social_network_types.h"
 #include "../ClientPool.h"
@@ -49,23 +40,6 @@ void UserMentionHandler::ComposeUserMentions(
     std::vector<UserMention> &_return, int64_t req_id,
     const std::vector<std::string> &usernames,
     const std::map<std::string, std::string> &carrier) {
-  opentelemetry::trace::StartSpanOptions options;
-  OtelTextMapReader otel_carrier_reader(carrier);
-  // Extract the context using the global propagator
-  auto prop         = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-  auto orig_ctx     = opentelemetry::context::RuntimeContext::GetCurrent();
-  auto prev_ctx     = prop->Extract(otel_carrier_reader, orig_ctx);
-  options.parent    = opentelemetry::trace::GetSpan(prev_ctx)->GetContext();
- 
-  auto tracer           = opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("user-mention-service");
-  auto ospan            = tracer->StartSpan("compose_user_mentions_server", options);
-  auto scoped_ospan     = tracer->WithActiveSpan(ospan);
-  auto current_context  = opentelemetry::context::RuntimeContext::GetCurrent();
-  auto span_ctx         = ospan->GetContext();
-
-  auto logger       = opentelemetry::logs::Provider::GetLoggerProvider()->GetLogger("user-mention-service");
-
-  // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
@@ -90,10 +64,6 @@ void UserMentionHandler::ComposeUserMentions(
       ServiceException se;
       se.errorCode = ErrorCode::SE_MEMCACHED_ERROR;
       se.message = "Failed to pop a client from memcached pool";
-      logger->EmitLogRecord(opentelemetry::logs::Severity::kError, 
-                      se.message, span_ctx.trace_id(),
-                      span_ctx.span_id(), span_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
       throw se;
     }
 
@@ -110,11 +80,6 @@ void UserMentionHandler::ComposeUserMentions(
       idx++;
     }
 
-    // auto parent_context        = opentelemetry::context::RuntimeContext::Attach(current_context);
-    auto get_ospan             = tracer->StartSpan("compose_user_mentions_memcached_get_client");
-    auto get_scoped_ospan      = tracer->WithActiveSpan(get_ospan);
-    auto get_ospan_ctx         = get_ospan->GetContext();
-
     auto get_span = opentracing::Tracer::Global()->StartSpan(
         "compose_user_mentions_memcached_get_client",
         {opentracing::ChildOf(&span->context())});
@@ -122,18 +87,11 @@ void UserMentionHandler::ComposeUserMentions(
     if (rc != MEMCACHED_SUCCESS) {
       LOG(error) << "Cannot get usernames of request " << req_id << ": "
                  << memcached_strerror(client, rc);
-      std::string msg = "Cannot get usernames of request " + std::to_string(req_id) + ": " +
-           memcached_strerror(client, rc);
-      logger->EmitLogRecord(opentelemetry::logs::Severity::kError, 
-                      msg, get_ospan_ctx.trace_id(),
-                      get_ospan_ctx.span_id(), get_ospan_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
       ServiceException se;
       se.errorCode = ErrorCode::SE_MEMCACHED_ERROR;
       se.message = memcached_strerror(client, rc);
       memcached_pool_push(_memcached_client_pool, client);
       get_span->Finish();
-      get_ospan->End();
       throw se;
     }
 
@@ -149,11 +107,6 @@ void UserMentionHandler::ComposeUserMentions(
       if (return_value == nullptr) {
         LOG(debug) << "Memcached mget finished "
                    << memcached_strerror(client, rc);
-        std::string msg = "Memcached mget finished " + std::string(memcached_strerror(client, rc));
-        logger->EmitLogRecord(opentelemetry::logs::Severity::kDebug, 
-                      msg, get_ospan_ctx.trace_id(),
-                      get_ospan_ctx.span_id(), get_ospan_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
         break;
       }
       if (rc != MEMCACHED_SUCCESS) {
@@ -161,21 +114,11 @@ void UserMentionHandler::ComposeUserMentions(
         memcached_quit(client);
         memcached_pool_push(_memcached_client_pool, client);
         LOG(error) << "Cannot get components of request " << req_id;
-        std::string msg = "Cannot get components of request " + req_id;
-        logger->EmitLogRecord(opentelemetry::logs::Severity::kError, 
-                      msg, get_ospan_ctx.trace_id(),
-                      get_ospan_ctx.span_id(), get_ospan_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
         ServiceException se;
         se.errorCode = ErrorCode::SE_MEMCACHED_ERROR;
         se.message =
             "Cannot get usernames of request " + std::to_string(req_id);
-        logger->EmitLogRecord(opentelemetry::logs::Severity::kError, 
-                      se.message, get_ospan_ctx.trace_id(),
-                      get_ospan_ctx.span_id(), get_ospan_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
         get_span->Finish();
-        get_ospan->End();
         throw se;
       }
       UserMention new_user_mention;
@@ -192,7 +135,6 @@ void UserMentionHandler::ComposeUserMentions(
     memcached_quit(client);
     memcached_pool_push(_memcached_client_pool, client);
     get_span->Finish();
-    get_ospan->End();
     for (int i = 0; i < usernames.size(); ++i) {
       delete keys[i];
     }
@@ -201,9 +143,6 @@ void UserMentionHandler::ComposeUserMentions(
 
     // Find the rest in MongoDB
     if (!usernames_not_cached.empty()) {
-      auto find_ospan            = tracer->StartSpan("compose_user_mentions_mongo_find_client");
-      auto find_scoped_ospan     = tracer->WithActiveSpan(find_ospan);
-      auto find_ospan_ctx        = find_ospan->GetContext();
 
       mongoc_client_t *mongodb_client =
           mongoc_client_pool_pop(_mongodb_client_pool);
@@ -211,10 +150,6 @@ void UserMentionHandler::ComposeUserMentions(
         ServiceException se;
         se.errorCode = ErrorCode::SE_MONGODB_ERROR;
         se.message = "Failed to pop a client from MongoDB pool";
-        logger->EmitLogRecord(opentelemetry::logs::Severity::kError, 
-                      se.message, find_ospan_ctx.trace_id(),
-                      find_ospan_ctx.span_id(), find_ospan_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
         throw se;
       }
 
@@ -224,10 +159,6 @@ void UserMentionHandler::ComposeUserMentions(
         ServiceException se;
         se.errorCode = ErrorCode::SE_MONGODB_ERROR;
         se.message = "Failed to create collection user from DB user";
-        logger->EmitLogRecord(opentelemetry::logs::Severity::kError, 
-                      se.message, find_ospan_ctx.trace_id(),
-                      find_ospan_ctx.span_id(), find_ospan_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
         mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
         throw se;
       }
@@ -265,16 +196,11 @@ void UserMentionHandler::ComposeUserMentions(
           ServiceException se;
           se.errorCode = ErrorCode::SE_MONGODB_ERROR;
           se.message = "Attribute of MongoDB item is not complete";
-          logger->EmitLogRecord(opentelemetry::logs::Severity::kError, 
-                      se.message, find_ospan_ctx.trace_id(),
-                      find_ospan_ctx.span_id(), find_ospan_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
           bson_destroy(query);
           mongoc_cursor_destroy(cursor);
           mongoc_collection_destroy(collection);
           mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
           find_span->Finish();
-          find_ospan->End();
           throw se;
         }
         if (bson_iter_init_find(&iter, doc, "username")) {
@@ -283,16 +209,11 @@ void UserMentionHandler::ComposeUserMentions(
           ServiceException se;
           se.errorCode = ErrorCode::SE_MONGODB_ERROR;
           se.message = "Attribute of MongoDB item is not complete";
-          logger->EmitLogRecord(opentelemetry::logs::Severity::kError, 
-                      se.message, find_ospan_ctx.trace_id(),
-                      find_ospan_ctx.span_id(), find_ospan_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
           bson_destroy(query);
           mongoc_cursor_destroy(cursor);
           mongoc_collection_destroy(collection);
           mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
           find_span->Finish();
-          find_ospan->End();
           throw se;
         }
         user_mentions.emplace_back(new_user_mention);
@@ -302,13 +223,11 @@ void UserMentionHandler::ComposeUserMentions(
       mongoc_collection_destroy(collection);
       mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
       find_span->Finish();
-      find_ospan->End();
     }
   }
 
   _return = user_mentions;
   span->Finish();
-  ospan->End();
 }
 
 }  // namespace social_network

@@ -10,15 +10,6 @@
 #include <libmemcached/util.h>
 #include <bson/bson.h>
 
-#include <opentelemetry/trace/provider.h>
-#include <opentelemetry/trace/tracer.h>
-#include <opentelemetry/trace/span.h>
-#include <opentelemetry/trace/scope.h>
-#include <opentelemetry/trace/span_startoptions.h>
-#include <opentelemetry/trace/propagation/http_trace_context.h>
-#include <opentelemetry/context/runtime_context.h>
-#include <opentelemetry/context/propagation/global_propagator.h>
-
 #include "../../gen-cpp/UrlShortenService.h"
 #include "../../gen-cpp/social_network_types.h"
 #include "../logger.h"
@@ -83,26 +74,6 @@ void UrlShortenHandler::ComposeUrls(
   // for (const auto& pair : carrier) {
   //   LOG(info) << pair.first << ": " << pair.second << "\n";
   // }
-  opentelemetry::trace::StartSpanOptions options;
-  OtelTextMapReader otel_carrier_reader(carrier);
-  // Extract the context using the global propagator
-  auto prop         = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-  auto orig_ctx     = opentelemetry::context::RuntimeContext::GetCurrent();
-  auto prev_ctx     = prop->Extract(otel_carrier_reader, orig_ctx);
-  options.parent    = opentelemetry::trace::GetSpan(prev_ctx)->GetContext();
- 
-  auto tracer           = opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("url-shorten-service");
-  auto ospan            = tracer->StartSpan("compose_urls_server", options);
-  auto scoped_ospan     = tracer->WithActiveSpan(ospan);
-  auto current_context  = opentelemetry::context::RuntimeContext::GetCurrent();
-  auto span_ctx         = ospan->GetContext();
-
-  auto logger       = opentelemetry::logs::Provider::GetLoggerProvider()->GetLogger("url-shorten-service");
-  // logger->EmitLogRecord(opentelemetry::logs::Severity::kDebug, "*******Test222*****", span_ctx.trace_id(),
-  //                     span_ctx.span_id(), span_ctx.trace_flags(),
-  //                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
-
-  // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
@@ -126,10 +97,6 @@ void UrlShortenHandler::ComposeUrls(
 
     mongo_future = std::async(
         std::launch::async, [&](){
-          auto parent_context = opentelemetry::context::RuntimeContext::Attach(current_context);
-          auto mongo_ospan          = tracer->StartSpan("url_mongo_insert_client");
-          auto mongo_scoped_ospan   = tracer->WithActiveSpan(mongo_ospan);
-          auto mongo_ospan_ctx      = mongo_ospan->GetContext();
 
           mongoc_client_t *mongodb_client = mongoc_client_pool_pop(
               _mongodb_client_pool);
@@ -137,8 +104,6 @@ void UrlShortenHandler::ComposeUrls(
             ServiceException se;
             se.errorCode = ErrorCode::SE_MONGODB_ERROR;
             se.message = "Failed to pop a client from MongoDB pool";
-            logger->EmitLogRecord(opentelemetry::logs::Severity::kError, "Failed to pop a client from MongoDB pool", mongo_ospan_ctx.trace_id(), mongo_ospan_ctx.span_id(), mongo_ospan_ctx.trace_flags(),
-            opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
             throw se;
           }
           auto collection = mongoc_client_get_collection(
@@ -147,8 +112,6 @@ void UrlShortenHandler::ComposeUrls(
             ServiceException se;
             se.errorCode = ErrorCode::SE_MONGODB_ERROR;
             se.message = "Failed to create collection user from DB user";
-            logger->EmitLogRecord(opentelemetry::logs::Severity::kError, "Failed to create collection user from DB user", mongo_ospan_ctx.trace_id(), mongo_ospan_ctx.span_id(), mongo_ospan_ctx.trace_flags(),
-            opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
             mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
             throw se;
           }
@@ -174,16 +137,10 @@ void UrlShortenHandler::ComposeUrls(
           ret = mongoc_bulk_operation_execute (bulk, &reply, &error);
           if (!ret) {
             LOG(error) << "MongoDB error: "<< error.message;
-            std::string msg = "MongoDB error: " + std::string(error.message); 
-            logger->EmitLogRecord(opentelemetry::logs::Severity::kError, msg, mongo_ospan_ctx.trace_id(), mongo_ospan_ctx.span_id(), mongo_ospan_ctx.trace_flags(),
-            opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
             ServiceException se;
             se.errorCode = ErrorCode::SE_MONGODB_ERROR;
             se.message = "Failed to insert urls to MongoDB";
-
-            logger->EmitLogRecord(opentelemetry::logs::Severity::kError, "Failed to insert urls to MongoDB", mongo_ospan_ctx.trace_id(), mongo_ospan_ctx.span_id(), mongo_ospan_ctx.trace_flags(),
-            opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
             bson_destroy (&reply);
             mongoc_bulk_operation_destroy(bulk);
@@ -197,18 +154,14 @@ void UrlShortenHandler::ComposeUrls(
           mongoc_client_pool_push(_mongodb_client_pool, mongodb_client);
           mongo_span->Finish();
 
-          mongo_ospan->End();
         });
   }
-
 
   if (!urls.empty()) {
     try {
       mongo_future.get();
     } catch (...) {
       LOG(error) << "Failed to upload shortened urls from MongoDB";
-      logger->EmitLogRecord(opentelemetry::logs::Severity::kError, "Failed to upload shortened urls from MongoDB", span_ctx.trace_id(), span_ctx.span_id(), span_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
       throw;
     }
   }
@@ -216,7 +169,6 @@ void UrlShortenHandler::ComposeUrls(
   _return = target_urls;
   span->Finish();
   
-  ospan->End();
 }
 
 void UrlShortenHandler::GetExtendedUrls(
@@ -229,7 +181,6 @@ void UrlShortenHandler::GetExtendedUrls(
 }
 
 }
-
 
 
 #endif //SOCIAL_NETWORK_MICROSERVICES_SRC_URLSHORTENSERVICE_URLSHORTENHANDLER_H_

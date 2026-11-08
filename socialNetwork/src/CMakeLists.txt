@@ -5,10 +5,6 @@ include("../cmake/Findlibmemcached.cmake")
 include("../cmake/Findthrift.cmake")
 include("../cmake/FindLibevent.cmake")
 
-include_directories(
-  ${CMAKE_SOURCE_DIR}/exporters/ostream/include
-  ${CMAKE_SOURCE_DIR}/exporters/otlp/include)
-
 find_package(libmongoc-1.0 1.13 REQUIRED)
 find_package(nlohmann_json 3.5.0 REQUIRED)
 find_package(Threads)

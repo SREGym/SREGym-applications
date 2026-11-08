@@ -6,13 +6,6 @@
 #include <regex>
 #include <string>
 
-#include <opentelemetry/trace/provider.h>
-#include <opentelemetry/trace/tracer.h>
-#include <opentelemetry/trace/span.h>
-#include <opentelemetry/trace/span_startoptions.h>
-#include <opentelemetry/context/propagation/global_propagator.h>
-#include <opentelemetry/context/propagation/text_map_propagator.h>
-
 #include "../../gen-cpp/TextService.h"
 #include "../../gen-cpp/UrlShortenService.h"
 #include "../../gen-cpp/UserMentionService.h"
@@ -48,23 +41,6 @@ TextHandler::TextHandler(
 void TextHandler::ComposeText(
     TextServiceReturn &_return, int64_t req_id, const std::string &text,
     const std::map<std::string, std::string> &carrier) {
-  opentelemetry::trace::StartSpanOptions options;
-  OtelTextMapReader otel_carrier_reader(carrier);
-  // Extract the context using the global propagator
-  auto prop         = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-  auto orig_ctx     = opentelemetry::context::RuntimeContext::GetCurrent();
-  auto prev_ctx     = prop->Extract(otel_carrier_reader, orig_ctx);
-  options.parent    = opentelemetry::trace::GetSpan(prev_ctx)->GetContext();
- 
-  auto tracer       = opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("text-service");
-  auto ospan        = tracer->StartSpan("compose_text_server", options);
-  auto scoped_ospan = tracer->WithActiveSpan(ospan);
-  auto current_context = opentelemetry::context::RuntimeContext::GetCurrent();
-  auto span_ctx        = ospan->GetContext();
-
-  auto logger       = opentelemetry::logs::Provider::GetLoggerProvider()->GetLogger("text-service");
-
-  // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
@@ -94,93 +70,64 @@ void TextHandler::ComposeText(
   }
 
   auto shortened_urls_future = std::async(std::launch::async, [&]() {
-    auto parent_context = opentelemetry::context::RuntimeContext::Attach(current_context);
-    auto url_ospan = tracer->StartSpan("compose_urls_client");
-    auto url_scoped_ospan = tracer->WithActiveSpan(url_ospan);
-    auto span_ctx         = url_ospan->GetContext();
-
-    auto new_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
-    std::map<std::string, std::string> url_text_map;
-    OtelTextMapWriter url_otel_writer(url_text_map);
-    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-    prop->Inject(url_otel_writer, new_ctx);
-
-    // auto url_span = opentracing::Tracer::Global()->StartSpan(
-    //     "compose_urls_client", {opentracing::ChildOf(&span->context())});
-
-    // std::map<std::string, std::string> url_writer_text_map;
-    // TextMapWriter url_writer(url_writer_text_map);
-    // opentracing::Tracer::Global()->Inject(url_span->context(), url_writer);
+    auto url_span = opentracing::Tracer::Global()->StartSpan(
+        "compose_urls_client", {opentracing::ChildOf(&span->context())});
+    std::map<std::string, std::string> url_writer_text_map;
+    TextMapWriter url_writer(url_writer_text_map);
+    opentracing::Tracer::Global()->Inject(url_span->context(), url_writer);
 
     auto url_client_wrapper = _url_client_pool->Pop();
     if (!url_client_wrapper) {
       ServiceException se;
       se.errorCode = ErrorCode::SE_THRIFT_CONN_ERROR;
       se.message = "Failed to connect to url-shorten-service";
+      url_span->Finish();
       throw se;
     }
     std::vector<Url> _return_urls;
     auto url_client = url_client_wrapper->GetClient();
     try {
-      // url_client->ComposeUrls(_return_urls, req_id, urls, url_writer_text_map);
-      url_client->ComposeUrls(_return_urls, req_id, urls, url_text_map);
+      url_client->ComposeUrls(_return_urls, req_id, urls, url_writer_text_map);
     } catch (...) {
       LOG(error) << "Failed to upload urls to url-shorten-service";
-      logger->EmitLogRecord(opentelemetry::logs::Severity::kError, "Failed to upload urls to url-shorten-service", span_ctx.trace_id(), span_ctx.span_id(), span_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
       _url_client_pool->Remove(url_client_wrapper);
+      url_span->Finish();
       throw;
     }
     _url_client_pool->Keepalive(url_client_wrapper);
+    url_span->Finish();
     return _return_urls;
   });
 
   auto user_mention_future = std::async(std::launch::async, [&]() {
-    auto parent_context     = opentelemetry::context::RuntimeContext::Attach(current_context);
-    auto user_mention_ospan = tracer->StartSpan("compose_user_mentions_client");
-    auto user_mention_scoped_ospan = tracer->WithActiveSpan(user_mention_ospan);
-    auto span_ctx           = user_mention_ospan->GetContext();
-
-    auto new_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
-    std::map<std::string, std::string> user_mention_text_map;
-    OtelTextMapWriter user_mention_otel_writer(user_mention_text_map);
-    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-    prop->Inject(user_mention_otel_writer, new_ctx);
-
-    // auto user_mention_span = opentracing::Tracer::Global()->StartSpan(
-    //     "compose_user_mentions_client",
-    //     {opentracing::ChildOf(&span->context())});
-
-    // std::map<std::string, std::string> user_mention_writer_text_map;
-    // TextMapWriter user_mention_writer(user_mention_writer_text_map);
-    // opentracing::Tracer::Global()->Inject(user_mention_span->context(),
-    //                                       user_mention_writer);
+    auto user_mention_span = opentracing::Tracer::Global()->StartSpan(
+        "compose_user_mentions_client", {opentracing::ChildOf(&span->context())});
+    std::map<std::string, std::string> user_mention_writer_text_map;
+    TextMapWriter user_mention_writer(user_mention_writer_text_map);
+    opentracing::Tracer::Global()->Inject(user_mention_span->context(), user_mention_writer);
 
     auto user_mention_client_wrapper = _user_mention_client_pool->Pop();
     if (!user_mention_client_wrapper) {
       ServiceException se;
       se.errorCode = ErrorCode::SE_THRIFT_CONN_ERROR;
       se.message = "Failed to connect to user-mention-service";
+      user_mention_span->Finish();
       throw se;
     }
     std::vector<UserMention> _return_user_mentions;
     auto user_mention_client = user_mention_client_wrapper->GetClient();
     try {
-      // user_mention_client->ComposeUserMentions(_return_user_mentions, req_id,
-      //                                          mention_usernames,
-      //                                          user_mention_writer_text_map);
       user_mention_client->ComposeUserMentions(_return_user_mentions, req_id,
-                                               mention_usernames,
-                                               user_mention_text_map);
+                                               mention_usernames, user_mention_writer_text_map);
     } catch (...) {
       LOG(error) << "Failed to upload user_mentions to user-mention-service";
-      logger->EmitLogRecord(opentelemetry::logs::Severity::kError, "Failed to upload user_mentions to user-mention-service", span_ctx.trace_id(), span_ctx.span_id(), span_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
       _user_mention_client_pool->Remove(user_mention_client_wrapper);
+      user_mention_span->Finish();
       throw;
     }
 
     _user_mention_client_pool->Keepalive(user_mention_client_wrapper);
+    user_mention_span->Finish();
     return _return_user_mentions;
   });
 
@@ -189,8 +136,6 @@ void TextHandler::ComposeText(
     target_urls = shortened_urls_future.get();
   } catch (...) {
     LOG(error) << "Failed to get shortened urls from url-shorten-service";
-    logger->EmitLogRecord(opentelemetry::logs::Severity::kError, "Failed to get shortened urls from url-shorten-service", span_ctx.trace_id(), span_ctx.span_id(), span_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
     throw;
   }
 
@@ -199,8 +144,6 @@ void TextHandler::ComposeText(
     user_mentions = user_mention_future.get();
   } catch (...) {
     LOG(error) << "Failed to upload user mentions to user-mention-service";
-    logger->EmitLogRecord(opentelemetry::logs::Severity::kError, "Failed to upload user mentions to user-mention-service", span_ctx.trace_id(), span_ctx.span_id(), span_ctx.trace_flags(),
-                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
     throw;
   }
 
@@ -223,7 +166,6 @@ void TextHandler::ComposeText(
   _return.text = updated_text;
   _return.urls = target_urls;
   span->Finish();
-  ospan->End();
 }
 
 }  // namespace social_network

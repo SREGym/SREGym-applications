@@ -4,7 +4,7 @@ global:
   restartPolicy: Always
   serviceType: ClusterIP
   dockerRegistry: docker.io
-  defaultImageVersion: sha-d2c036bc3d1138f5a0bdaffd3d87f37522c3461a@sha256:70287c4756f9187613e49409291927c342724e3974f93709b21595ed1cdf1d69
+  defaultImageVersion: 20261107.1@sha256:7ef45dd1fb253d9b34047a7e8f371eab00fc5d47cdece9e8d9a5ee516eb9fdee
   redis:
     cluster:
       enabled: false

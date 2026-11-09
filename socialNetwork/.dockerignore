@@ -8,3 +8,6 @@
 !/third_party/
 !/wrk2/
 !/docker/patch-redis-plus-plus.py
+!/docker/jaeger-pod-ip.patch
+!/docker/tests/jaeger_ip_selection.cpp
+!/docker/openresty-thrift/

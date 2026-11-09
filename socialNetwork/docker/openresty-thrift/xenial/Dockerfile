@@ -3,6 +3,8 @@ ARG RESTY_IMAGE_TAG="xenial"
 
 FROM ${RESTY_IMAGE_BASE}:${RESTY_IMAGE_TAG}
 
+COPY docker/jaeger-pod-ip.patch docker/tests/jaeger_ip_selection.cpp /tmp/
+
 LABEL maintainer="Yu Gan <yg397@cornell.edu>"
 
 # Docker Build Arguments
@@ -85,6 +87,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
         libreadline-dev \
         libxslt1-dev \
         make \
+        patch \
         perl \
         unzip \
         zlib1g-dev \
@@ -127,6 +130,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && curl -fSL https://github.com/jaegertracing/jaeger-client-cpp/archive/refs/tags/v${JAEGER_TRACING_VERSION}.tar.gz -o v${JAEGER_TRACING_VERSION}.tar.gz \
     && tar xf v${JAEGER_TRACING_VERSION}.tar.gz \
     && cd jaeger-client-cpp-${JAEGER_TRACING_VERSION} \
+    # OpenResty embeds its own SDK copy in the static tracing plugin.
+    && patch --batch --fuzz=0 -p1 < /tmp/jaeger-pod-ip.patch \
+    && g++ -std=c++11 -Isrc src/jaegertracing/net/IPAddress.cpp /tmp/jaeger_ip_selection.cpp -o /tmp/jaeger-ip-test \
+    && /tmp/jaeger-ip-test && rm /tmp/jaeger-ip-test \
     && mkdir build && cd build \
     && cmake CXXFLAGS="-Wno-error=deprecated-copy" -DCMAKE_INSTALL_PREFIX=/opt -DJAEGERTRACING_PLUGIN=ON -DHUNTER_CONFIGURATION_TYPES=Release -DHUNTER_BUILD_SHARED_LIBS=OFF .. \
     && make && make install \
@@ -182,9 +189,9 @@ ENV LUA_PATH="/usr/local/openresty/site/lualib/?.ljbc;/usr/local/openresty/site/
 ENV LUA_CPATH="/usr/local/openresty/site/lualib/?.so;/usr/local/openresty/lualib/?.so;./?.so;/usr/local/lib/lua/5.1/?.so;/usr/local/openresty/luajit/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/loadall.so;/usr/local/openresty/luajit/lib/lua/5.1/?.so;/usr/local/openresty/lualib/?/?.so"
 
 
-COPY lua-thrift /usr/local/openresty/lualib/thrift
-COPY lua-bridge-tracer /tmp/lua-bridge-tracer
-COPY lua-json/json.lua /usr/local/openresty/lualib/json/json.lua
+COPY docker/openresty-thrift/lua-thrift /usr/local/openresty/lualib/thrift
+COPY docker/openresty-thrift/lua-bridge-tracer /tmp/lua-bridge-tracer
+COPY docker/openresty-thrift/lua-json/json.lua /usr/local/openresty/lualib/json/json.lua
 
 RUN cd /usr/local/openresty/lualib/thrift/src \
     && make \
@@ -212,8 +219,8 @@ RUN luarocks install https://luarocks.org/manifests/siffiejoe/bit32-5.3.0-1.src.
 
 
 # Copy nginx configuration files
-COPY nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
-COPY nginx.vh.default.conf /etc/nginx/conf.d/default.conf
+COPY docker/openresty-thrift/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
+COPY docker/openresty-thrift/nginx.vh.default.conf /etc/nginx/conf.d/default.conf
 
 CMD ["/usr/local/openresty/bin/openresty", "-g", "daemon off;"]
 

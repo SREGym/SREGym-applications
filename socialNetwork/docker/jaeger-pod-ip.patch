@@ -1,0 +1,27 @@
+--- a/src/jaegertracing/net/IPAddress.cpp
++++ b/src/jaegertracing/net/IPAddress.cpp
+@@ -17,6 +17,7 @@
+ #include "jaegertracing/net/IPAddress.h"
+ 
+ #include <ifaddrs.h>
++#include <net/if.h>
+ #include <sys/types.h>
+ 
+ namespace jaegertracing {
+@@ -38,6 +39,7 @@
+ {
+     return localIP([family](const ifaddrs* ifAddr) {
+         return ifAddr->ifa_addr != nullptr &&
++               (ifAddr->ifa_flags & IFF_LOOPBACK) == 0 &&
+                ifAddr->ifa_addr->sa_family == family;
+     });
+ }
+@@ -49,7 +51,7 @@
+     std::unique_ptr<ifaddrs, IfAddrDeleter> ifAddr(ifAddrRawPtr);
+     for (auto* itr = ifAddr.get(); itr; itr = itr->ifa_next) {
+         if (filter(itr)) {
+-            const auto family = ifAddr->ifa_addr->sa_family;
++            const auto family = itr->ifa_addr->sa_family;
+             const auto addrLen = (family == AF_INET) ? sizeof(::sockaddr_in)
+                                                      : sizeof(::sockaddr_in6);
+             return IPAddress(*itr->ifa_addr, addrLen);

@@ -68,9 +68,8 @@ $EXEC push "$REGISTRY"/"$PROJECT"/"$SERVICE":"$TAG"
 # BUILD OPENRESTY-THRIFT
 SERVICE="openresty-thrift"
 if [[ $($EXEC images | grep $SERVICE | wc -l) -le 0 ]]; then
-  cd docker/openresty-thrift/
-  $EXEC build -t "$REGISTRY"/"$PROJECT"/"$SERVICE":"$TAG" -f xenial/Dockerfile .
-  cd $ROOT_FOLDER
+  $EXEC build -t "$REGISTRY"/"$PROJECT"/"$SERVICE":"$TAG" \
+    -f "$ROOT_FOLDER/docker/openresty-thrift/xenial/Dockerfile" "$ROOT_FOLDER"
 else
   echo "$SERVICE image already exist"
 fi

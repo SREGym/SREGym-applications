@@ -1,7 +1,7 @@
 # Portions Copyright (c) Microsoft Corporation
 # Licensed under the Apache License, Version 2.0. See LICENSE file in the project root for full license information.
 
-ARG SOCIAL_NETWORK_BASE_IMAGE=ghcr.io/sregym/social-network-deps:sha-d2c036bc3d1138f5a0bdaffd3d87f37522c3461a@sha256:7d66d10f9bd05ae8b635e0a861dbb9dd02ffd9ef1a49e6c383c3d97a981fb119
+ARG SOCIAL_NETWORK_BASE_IMAGE=ghcr.io/sregym/social-network-deps:20261109-trace-identity@sha256:6d8a152b59fcd9eb45f3f1540edcdf6201be1759f39b4645b4a183676e200c6f
 FROM ${SOCIAL_NETWORK_BASE_IMAGE} AS builder
 COPY docker/patch-redis-plus-plus.py /tmp/patch-redis-plus-plus.py
 

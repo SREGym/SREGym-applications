@@ -1,0 +1,24 @@
+{
+ "recurrence_matrix": [
+  "package",
+  "role"
+ ],
+ "recurrence_units": {
+  "package": "company-package",
+  "role": "company-role"
+ },
+ "recurrence_witness_phases": [
+  "role"
+ ],
+ "recurrence_fresh_checkouts": {
+  "role": "/var/lib/company/platform-role/checkout"
+ },
+ "reporting": {
+  "settle_seconds": 900
+ },
+ "reporting_routine_seconds": 150,
+ "recurrence_limit_seconds": 900,
+ "service_health": {
+  "max_age_seconds": 220
+ }
+}

@@ -1,0 +1,2 @@
+networkd_profile: cluster
+capacity: {cluster_eligible: true, role: control-plane}

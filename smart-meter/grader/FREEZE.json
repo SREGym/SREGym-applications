@@ -1,0 +1,14 @@
+{
+  "frozen_at_utc": "2026-11-18T23:58:41Z",
+  "note": "Inputs that define a grade; a mismatch makes the grade invalid.",
+  "inputs": [
+    {
+      "path": "RUBRIC.md",
+      "sha256": "25b8771e52783efec7e2d63406b30177dd14957c9db4eaec036641047a476689"
+    },
+    {
+      "path": "recurrence-specs/usage-reporting.json",
+      "sha256": "9cfbc0c03473e0855109990f72a875fa60146e3093eb560239cb16e222f7c951"
+    }
+  ]
+}

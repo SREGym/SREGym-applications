@@ -1,0 +1,90 @@
+{
+  "index": {
+    "snapshot": "20230918T000000Z",
+    "inrelease_sha256": "c0838f35f040e64cecdef01242184184311dbc5991767a091a01e0af7fe96077",
+    "packages_xz_sha256": "451e89021923caf500b5476ed7c96113ef156b65d66d1aed4b286939fa695f53",
+    "signature": "VALIDSIG, Ubuntu archive keyring"
+  },
+  "files": [
+    {
+      "package": "systemd",
+      "version": "249.11-0ubuntu3.10",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20230918T000000Z/pool/main/s/systemd/systemd_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 4580932,
+      "sha256": "da5f04e569f583cf891eb8d73ea246a8e24387e57ee8cd06f071465b4315c7c5",
+      "depends": "libacl1 (>= 2.2.23), libapparmor1 (>= 2.13), libaudit1 (>= 1:2.2.1), libcrypt1 (>= 1:4.4.0), libcryptsetup12 (>= 2:2.4), libgnutls30 (>= 3.7.2), libgpg-error0 (>= 1.14), libip4tc2 (>= 1.8.3), libkmod2 (>= 5~), liblz4-1 (>= 0.0~r130), libmount1 (>= 2.30), libpam0g (>= 0.99.7.1), libseccomp2 (>= 2.4.1), libssl3 (>= 3.0.0~~alpha1), libsystemd0 (= 249.11-0ubuntu3.10), util-linux (>= 2.27.1), mount (>= 2.26), adduser",
+      "pre_depends": "libblkid1 (>= 2.24), libc6 (>= 2.34), libcap2 (>= 1:2.24-9~), libgcrypt20 (>= 1.9.0), liblz4-1 (>= 0.0~r122), liblzma5 (>= 5.1.1alpha+20120614), libselinux1 (>= 3.1~), libzstd1 (>= 1.4.0)",
+      "retrieved_at_utc": "2026-10-24T00:35:35.497181+00:00"
+    },
+    {
+      "package": "udev",
+      "version": "249.11-0ubuntu3.10",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20230918T000000Z/pool/main/s/systemd/udev_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 1557190,
+      "sha256": "fc2c118a488641262b624908f4f3545388d037ccc665f440ec9114222a5a99da",
+      "depends": "libacl1 (>= 2.2.23), libblkid1 (>= 2.37.2), libc6 (>= 2.34), libcap2 (>= 1:2.24-9~), libkmod2 (>= 5~), libselinux1 (>= 3.1~), adduser, libudev1 (= 249.11-0ubuntu3.10), util-linux (>= 2.27.1)",
+      "pre_depends": "",
+      "retrieved_at_utc": "2026-10-24T00:35:35.499882+00:00"
+    },
+    {
+      "package": "libsystemd0",
+      "version": "249.11-0ubuntu3.10",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20230918T000000Z/pool/main/s/systemd/libsystemd0_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 318848,
+      "sha256": "97001f76f4dfb07b197e1a2bddd2a6a8174ae6403856dacbc13d4142dcac5059",
+      "depends": "",
+      "pre_depends": "libc6 (>= 2.34), libcap2 (>= 1:2.24-9~), libgcrypt20 (>= 1.9.0), liblz4-1 (>= 0.0~r122), liblzma5 (>= 5.1.1alpha+20120614), libzstd1 (>= 1.4.0)",
+      "retrieved_at_utc": "2026-10-24T00:35:35.500481+00:00"
+    },
+    {
+      "package": "libudev1",
+      "version": "249.11-0ubuntu3.10",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20230918T000000Z/pool/main/s/systemd/libudev1_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 77998,
+      "sha256": "29dca2614703f04584bf09d289653091b423ba7f157cb8b3090e375db2c0af39",
+      "depends": "libc6 (>= 2.34)",
+      "pre_depends": "",
+      "retrieved_at_utc": "2026-10-24T00:35:35.500672+00:00"
+    },
+    {
+      "package": "systemd-sysv",
+      "version": "249.11-0ubuntu3.10",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20230918T000000Z/pool/main/s/systemd/systemd-sysv_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 10460,
+      "sha256": "430d2e0e9035e224c1f430b6fbd79dfd1a244418c9e6cf6d24efc91ac90e79a5",
+      "depends": "systemd (= 249.11-0ubuntu3.10)",
+      "pre_depends": "systemd",
+      "retrieved_at_utc": "2026-10-24T00:35:35.500743+00:00"
+    },
+    {
+      "package": "systemd-timesyncd",
+      "version": "249.11-0ubuntu3.10",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20230918T000000Z/pool/main/s/systemd/systemd-timesyncd_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 31190,
+      "sha256": "5943d3b687fef522781f5d251c9187860119b27fcd0840bcbb847e964ecd31ef",
+      "depends": "libc6 (>= 2.34), systemd (= 249.11-0ubuntu3.10), adduser",
+      "pre_depends": "",
+      "retrieved_at_utc": "2026-10-24T00:35:35.500858+00:00"
+    },
+    {
+      "package": "libnss-systemd",
+      "version": "249.11-0ubuntu3.10",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20230918T000000Z/pool/main/s/systemd/libnss-systemd_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 132822,
+      "sha256": "cb7016c38ef07d3a26bafa0ec7dc7dd1016bffc9dad0ec7d6c283271ae7ffa0a",
+      "depends": "libc6 (>= 2.34), systemd (= 249.11-0ubuntu3.10)",
+      "pre_depends": "",
+      "retrieved_at_utc": "2026-10-24T00:35:35.501114+00:00"
+    },
+    {
+      "package": "libpam-systemd",
+      "version": "249.11-0ubuntu3.10",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20230918T000000Z/pool/main/s/systemd/libpam-systemd_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 202938,
+      "sha256": "866a3d4ec7212fdb6dd4d4f94b5d5eb7a0d83b4171bd8513e7189981e0e29319",
+      "depends": "libc6 (>= 2.34), libcap2 (>= 1:2.24-9~), libpam0g (>= 0.99.7.1), systemd (= 249.11-0ubuntu3.10), libpam-runtime (>= 1.0.1-6), default-dbus-system-bus | dbus-system-bus, systemd-sysv",
+      "pre_depends": "",
+      "retrieved_at_utc": "2026-10-24T00:35:35.501475+00:00"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "packages": [
+    {
+      "filename": "libnetplan0_0.105-0ubuntu2~22.04.3_amd64.deb",
+      "package": "libnetplan0",
+      "version": "0.105-0ubuntu2~22.04.3",
+      "bytes": 102686,
+      "sha256": "8c50fef6a5effb9f99eaacffa6ca356bc48029f19f2d4f086b4f6161fde994f6",
+      "source": "world/stage/netplan-0.105/libnetplan0_0.105-0ubuntu2~22.04.3_amd64.deb"
+    },
+    {
+      "filename": "netplan.io_0.105-0ubuntu2~22.04.3_amd64.deb",
+      "package": "netplan.io",
+      "version": "0.105-0ubuntu2~22.04.3",
+      "bytes": 92940,
+      "sha256": "43f222cfdbf5369a70904476268ae36a3bf9670cf1efaaf34321bbeb595b29d1",
+      "source": "world/stage/netplan-0.105/netplan.io_0.105-0ubuntu2~22.04.3_amd64.deb"
+    },
+    {
+      "filename": "libnss-systemd_249.11-0ubuntu3.10_amd64.deb",
+      "package": "libnss-systemd",
+      "version": "249.11-0ubuntu3.10",
+      "bytes": 132822,
+      "sha256": "cb7016c38ef07d3a26bafa0ec7dc7dd1016bffc9dad0ec7d6c283271ae7ffa0a",
+      "source": "world/stage/systemd-10/libnss-systemd_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "filename": "libpam-systemd_249.11-0ubuntu3.10_amd64.deb",
+      "package": "libpam-systemd",
+      "version": "249.11-0ubuntu3.10",
+      "bytes": 202938,
+      "sha256": "866a3d4ec7212fdb6dd4d4f94b5d5eb7a0d83b4171bd8513e7189981e0e29319",
+      "source": "world/stage/systemd-10/libpam-systemd_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "filename": "libsystemd0_249.11-0ubuntu3.10_amd64.deb",
+      "package": "libsystemd0",
+      "version": "249.11-0ubuntu3.10",
+      "bytes": 318848,
+      "sha256": "97001f76f4dfb07b197e1a2bddd2a6a8174ae6403856dacbc13d4142dcac5059",
+      "source": "world/stage/systemd-10/libsystemd0_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "filename": "libudev1_249.11-0ubuntu3.10_amd64.deb",
+      "package": "libudev1",
+      "version": "249.11-0ubuntu3.10",
+      "bytes": 77998,
+      "sha256": "29dca2614703f04584bf09d289653091b423ba7f157cb8b3090e375db2c0af39",
+      "source": "world/stage/systemd-10/libudev1_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "filename": "systemd-sysv_249.11-0ubuntu3.10_amd64.deb",
+      "package": "systemd-sysv",
+      "version": "249.11-0ubuntu3.10",
+      "bytes": 10460,
+      "sha256": "430d2e0e9035e224c1f430b6fbd79dfd1a244418c9e6cf6d24efc91ac90e79a5",
+      "source": "world/stage/systemd-10/systemd-sysv_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "filename": "systemd-timesyncd_249.11-0ubuntu3.10_amd64.deb",
+      "package": "systemd-timesyncd",
+      "version": "249.11-0ubuntu3.10",
+      "bytes": 31190,
+      "sha256": "5943d3b687fef522781f5d251c9187860119b27fcd0840bcbb847e964ecd31ef",
+      "source": "world/stage/systemd-10/systemd-timesyncd_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "filename": "systemd_249.11-0ubuntu3.10_amd64.deb",
+      "package": "systemd",
+      "version": "249.11-0ubuntu3.10",
+      "bytes": 4580932,
+      "sha256": "da5f04e569f583cf891eb8d73ea246a8e24387e57ee8cd06f071465b4315c7c5",
+      "source": "world/stage/systemd-10/systemd_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "filename": "udev_249.11-0ubuntu3.10_amd64.deb",
+      "package": "udev",
+      "version": "249.11-0ubuntu3.10",
+      "bytes": 1557190,
+      "sha256": "fc2c118a488641262b624908f4f3545388d037ccc665f440ec9114222a5a99da",
+      "source": "world/stage/systemd-10/udev_249.11-0ubuntu3.10_amd64.deb"
+    }
+  ],
+  "source_families": [
+    "systemd",
+    "netplan.io"
+  ],
+  "genuine_upgrade_binaries": 10,
+  "native_dependency_simulations_passed_hosts": 8,
+  "installs_performed": false,
+  "script_sha256": "cf22b3317fcbf077d765f11f333eb153dbda8046b7e90875faf5c04dc1efc7e2"
+}

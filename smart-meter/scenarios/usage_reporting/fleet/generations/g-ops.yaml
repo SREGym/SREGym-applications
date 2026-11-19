@@ -1,0 +1,2 @@
+networkd_profile: ordinary
+capacity: {cluster_eligible: false}

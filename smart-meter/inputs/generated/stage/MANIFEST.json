@@ -1,0 +1,455 @@
+{
+  "files": {
+    "kubeadm": {
+      "source": "https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubeadm",
+      "checksum_source": "https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubeadm.sha256",
+      "algorithm": "sha256",
+      "size": 46776320,
+      "sha256": "87a1bf6603e252a8fa46be44382ea218cb8e4f066874d149dc589d0f3a405fed"
+    },
+    "kubelet": {
+      "source": "https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubelet",
+      "checksum_source": "https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubelet.sha256",
+      "algorithm": "sha256",
+      "size": 121272536,
+      "sha256": "992d6298bd494b65f54c838419773c4976aca72dfb36271c613537efae7ab7d2"
+    },
+    "kubectl": {
+      "source": "https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubectl",
+      "checksum_source": "https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubectl.sha256",
+      "algorithm": "sha256",
+      "size": 48037888,
+      "sha256": "026c8412d373064ab0359ed0d1a25c975e9ce803a093d76c8b30c5996ad73e75"
+    },
+    "containerd-1.6.20-linux-amd64.tar.gz": {
+      "source": "https://github.com/containerd/containerd/releases/download/v1.6.20/containerd-1.6.20-linux-amd64.tar.gz",
+      "checksum_source": "https://github.com/containerd/containerd/releases/download/v1.6.20/containerd-1.6.20-linux-amd64.tar.gz.sha256sum",
+      "algorithm": "sha256",
+      "size": 44102774,
+      "sha256": "bb9a9ccd6517e2a54da748a9f60dc9aa9d79d19d4724663f2386812f083968e2"
+    },
+    "runc.amd64": {
+      "source": "https://github.com/opencontainers/runc/releases/download/v1.1.5/runc.amd64",
+      "checksum_source": "https://github.com/opencontainers/runc/releases/download/v1.1.5/runc.sha256sum",
+      "algorithm": "sha256",
+      "size": 9431456,
+      "sha256": "f00b144e86f8c1db347a2e8f22caade07d55382c5f76dd5c0a5b1ab64eaec8bb"
+    },
+    "cni-plugins-linux-amd64-v1.2.0.tgz": {
+      "source": "https://github.com/containernetworking/plugins/releases/download/v1.2.0/cni-plugins-linux-amd64-v1.2.0.tgz",
+      "checksum_source": "https://github.com/containernetworking/plugins/releases/download/v1.2.0/cni-plugins-linux-amd64-v1.2.0.tgz.sha256",
+      "algorithm": "sha256",
+      "size": 40517426,
+      "sha256": "f3a841324845ca6bf0d4091b4fc7f97e18a623172158b72fc3fdcdb9d42d2d37"
+    },
+    "crictl-v1.26.1-linux-amd64.tar.gz": {
+      "source": "https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.26.1/crictl-v1.26.1-linux-amd64.tar.gz",
+      "checksum_source": "https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.26.1/crictl-v1.26.1-linux-amd64.tar.gz.sha256",
+      "algorithm": "sha256",
+      "size": 23410699,
+      "sha256": "0c1a0f9900c15ee7a55e757bcdc220faca5dd2e1cfc120459ad1f04f08598127"
+    },
+    "kafka_2.13-3.4.0.tgz": {
+      "source": "https://archive.apache.org/dist/kafka/3.4.0/kafka_2.13-3.4.0.tgz",
+      "checksum_source": "https://archive.apache.org/dist/kafka/3.4.0/kafka_2.13-3.4.0.tgz.sha512",
+      "algorithm": "sha512",
+      "size": 106290956,
+      "sha256": "67025feb03eb963a8852d4adc5b2810744f493a672c5992728955e38bed43da8"
+    },
+    "apache-zookeeper-3.7.1-bin.tar.gz": {
+      "source": "https://archive.apache.org/dist/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1-bin.tar.gz",
+      "checksum_source": "https://archive.apache.org/dist/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1-bin.tar.gz.sha512",
+      "algorithm": "sha512",
+      "size": 12649765,
+      "sha256": "dedf166f9a5fb12240041385a74ec81ce9de63f2a49454883027cf6acae202a5"
+    },
+    "kafka_python-2.0.2-py2.py3-none-any.whl": {
+      "source": "https://files.pythonhosted.org/packages/75/68/dcb0db055309f680ab2931a3eeb22d865604b638acf8c914bedf4c1a0c8c/kafka_python-2.0.2-py2.py3-none-any.whl",
+      "checksum_source": "sha256:2d92418c7cb1c298fa6c7f0fb3519b520d0d7526ac6cb7ae2a4fc65a51a94b6e",
+      "algorithm": "sha256",
+      "size": 246508,
+      "sha256": "2d92418c7cb1c298fa6c7f0fb3519b520d0d7526ac6cb7ae2a4fc65a51a94b6e"
+    },
+    "paho-mqtt-1.6.1.tar.gz": {
+      "source": "https://files.pythonhosted.org/packages/f8/dd/4b75dcba025f8647bc9862ac17299e0d7d12d3beadbf026d8c8d74215c12/paho-mqtt-1.6.1.tar.gz",
+      "checksum_source": "sha256:2a8291c81623aec00372b5a85558a372c747cbca8e9934dfe218638b8eefc26f",
+      "algorithm": "sha256",
+      "size": 99373,
+      "sha256": "2a8291c81623aec00372b5a85558a372c747cbca8e9934dfe218638b8eefc26f"
+    },
+    "helm.tar.gz": {
+      "source": "staged for M1, re-verified",
+      "size": 15489735,
+      "sha256": "ca2d5d40d4cdfb9a3a6205dd803b5bc8def00bd2f13e5526c127e9b667974a89"
+    },
+    "cilium-1.13.2.tgz": {
+      "source": "staged for M1, re-verified",
+      "size": 118935,
+      "sha256": "a531fb73dd654b501b09305a7e77248082b45f999786a1018263bd514aed2fb7"
+    },
+    "pg8000-1.29.8-py3-none-any.whl": {
+      "source": "https://files.pythonhosted.org/packages/21/06/2b6af25d8ee88a4bac66796830c7a0744808c9ef8f264df87b1834c17d6e/pg8000-1.29.8-py3-none-any.whl",
+      "checksum_source": "sha256:962e9d6687f76057bd6d9c9c0f67f503a503216bf60b3a4d71e4cb8c97f8326d",
+      "algorithm": "sha256",
+      "size": 53486,
+      "sha256": "962e9d6687f76057bd6d9c9c0f67f503a503216bf60b3a4d71e4cb8c97f8326d"
+    },
+    "scramp-1.4.4-py3-none-any.whl": {
+      "source": "https://files.pythonhosted.org/packages/5f/0a/e4f1cac55d593d07cc75b1949473c28c8024ce7ea3cda9e8b888f2896614/scramp-1.4.4-py3-none-any.whl",
+      "checksum_source": "sha256:b142312df7c2977241d951318b7ee923d6b7a4f75ba0f05b621ece1ed616faa3",
+      "algorithm": "sha256",
+      "size": 13120,
+      "sha256": "b142312df7c2977241d951318b7ee923d6b7a4f75ba0f05b621ece1ed616faa3"
+    },
+    "asn1crypto-1.5.1-py2.py3-none-any.whl": {
+      "source": "https://files.pythonhosted.org/packages/c9/7f/09065fd9e27da0eda08b4d6897f1c13535066174cc023af248fc2a8d5e5a/asn1crypto-1.5.1-py2.py3-none-any.whl",
+      "checksum_source": "sha256:db4e40728b728508912cbb3d44f19ce188f218e9eba635821bb4b68564f8fd67",
+      "algorithm": "sha256",
+      "size": 105045,
+      "sha256": "db4e40728b728508912cbb3d44f19ce188f218e9eba635821bb4b68564f8fd67"
+    },
+    "python_dateutil-2.8.2-py2.py3-none-any.whl": {
+      "source": "https://files.pythonhosted.org/packages/36/7a/87837f39d0296e723bb9b62bbb257d0355c7f6128853c78955f57342a56d/python_dateutil-2.8.2-py2.py3-none-any.whl",
+      "checksum_source": "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9",
+      "algorithm": "sha256",
+      "size": 247702,
+      "sha256": "961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"
+    },
+    "six-1.16.0-py2.py3-none-any.whl": {
+      "source": "https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl",
+      "checksum_source": "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254",
+      "algorithm": "sha256",
+      "size": 11053,
+      "sha256": "8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"
+    }
+  },
+  "images": {
+    "kube-apiserver": {
+      "reference": "registry.k8s.io/kube-apiserver:v1.26.3",
+      "manifest_digest": "sha256:2168d67e42a6f3695220178c482c080aa8985bec576244794c3e19672b41db0c",
+      "archive_sha256": "3fdb1e0ff61baba9ab3cd038cab15f1559b52bc7dde2f9d411189d6ed067dafc",
+      "size": 35361792
+    },
+    "kube-controller-manager": {
+      "reference": "registry.k8s.io/kube-controller-manager:v1.26.3",
+      "manifest_digest": "sha256:bec5689bc26cb8b8eb280ed891a76b5509a706a3400107881e0cc2c11ef0baa7",
+      "archive_sha256": "ddeaf71ba3e74622ac83f268d098fd4b21724825109fcd10d0ed3feac93879b4",
+      "size": 32209408
+    },
+    "kube-scheduler": {
+      "reference": "registry.k8s.io/kube-scheduler:v1.26.3",
+      "manifest_digest": "sha256:cba0b5dfad13394e24b5b816c0834ed89a704bcc75d4a7dacc93c4550d4fb945",
+      "archive_sha256": "2fde0d37b1c9f8a3f8daacec23894eef21c9b525e67bf0d1078164806062fd2c",
+      "size": 17519616
+    },
+    "kube-proxy": {
+      "reference": "registry.k8s.io/kube-proxy:v1.26.3",
+      "manifest_digest": "sha256:9fd18772468841f2eb567b07ed7022cda7aab2365b4539d32a08c525d2d94c1a",
+      "archive_sha256": "2b280a9f908ccbd4a21e16a71d92cd65b0ddaf52a7f5ae9c6521509b1bf7e6cd",
+      "size": 21545984
+    },
+    "etcd": {
+      "reference": "registry.k8s.io/etcd:3.5.7-0",
+      "manifest_digest": "sha256:8ae03c7bbd43d5c301eea33a39ac5eda2964f826050cb2ccf3486f18917590c9",
+      "archive_sha256": "8793975f48be5e7f2d62ebacf3f0317a5af7a96f4bf49cf7837a2e89075829c1",
+      "size": 101642240
+    },
+    "coredns": {
+      "reference": "registry.k8s.io/coredns/coredns:v1.9.3",
+      "manifest_digest": "sha256:bdb36ee882c13135669cfc2bb91c808a33926ad1a411fee07bd2dc344bb8f782",
+      "archive_sha256": "1ac6033b2c1a226c1af417460e660f9b28179e6944ca3955bd2df00f8306309a",
+      "size": 14839296
+    },
+    "pause": {
+      "reference": "registry.k8s.io/pause:3.9",
+      "manifest_digest": "sha256:8d4106c88ec0bd28001e34c975d65175d994072d65341f62a8ab0754b0fafe10",
+      "archive_sha256": "3959851be8d0cb6d3080caccf1643c4733cccb7ffae335045fd8dc8a2e57b1cf",
+      "size": 322048
+    },
+    "emqx": {
+      "reference": "docker.io/emqx/emqx:5.0.26",
+      "manifest_digest": "sha256:568eb80eac7c054a0a843d6cdac623634717a2bf4a94a2f1f3f41476fc54947b",
+      "archive_sha256": "d3402515b9b21c67e314b101a63646fa1ab32d5d94304c40569ef0c6bd78db27",
+      "size": 168159744
+    },
+    "temurin": {
+      "reference": "docker.io/library/eclipse-temurin:17.0.8_7-jre-jammy",
+      "manifest_digest": "sha256:b8af44d6a7e0615a7486d7307dd54bba23ff24e3aea14893fd2795e8c436d44e",
+      "archive_sha256": "b61d1710de391fada7db2e788b227d43cf7cb2211aca7e75eabcbf79dd2f515c",
+      "size": 95118336
+    },
+    "python": {
+      "reference": "docker.io/library/python:3.11.5-slim-bookworm",
+      "manifest_digest": "sha256:a28fdf3bde6c0c97b656841669f6b4cc8164d0f34067c6ce6b5532effe94f8a7",
+      "archive_sha256": "060b7cdaefade8870ba40e8675ebebd6d0c1e3dab52302012dca9dd15a7ad22f",
+      "size": 48859136
+    },
+    "postgres": {
+      "reference": "docker.io/library/postgres:15.3",
+      "manifest_digest": "sha256:5eea7fae473638d38f2bd40a80b60baeb90d133a3bfb2a0315e9d1ff2e1e2218",
+      "archive_sha256": "01cc49ce94f8944f2ef9edc2d6444f160c8bad06886fc0de0418168f24f9adfb",
+      "size": 148886528
+    }
+  },
+  "approved_stage4": {
+    "gitea-1.19.4-linux-amd64": {
+      "source": "https://github.com/go-gitea/gitea/releases/download/v1.19.4/gitea-1.19.4-linux-amd64",
+      "size": 125779040,
+      "sha256": "bf68e8e39c70dc54a7876527d463b517f8af51a2d2924511cd047f479cd8aefd",
+      "checksum_source": "https://github.com/go-gitea/gitea/releases/download/v1.19.4/gitea-1.19.4-linux-amd64.sha256",
+      "algorithm": "sha256",
+      "verification": "publisher checksum",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792880438.772145,
+      "path": "stage/s4a/gitea-1.19.4-linux-amd64"
+    },
+    "loki-linux-amd64.zip": {
+      "source": "https://github.com/grafana/loki/releases/download/v2.8.2/loki-linux-amd64.zip",
+      "size": 18930096,
+      "sha256": "ed5582a8945e7b215932d196f474f812db07cb92db3685c5fbd95300414e0918",
+      "checksum_source": "https://github.com/grafana/loki/releases/download/v2.8.2/SHA256SUMS",
+      "algorithm": "sha256",
+      "verification": "publisher checksum",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792880441.9030368,
+      "path": "stage/s4a/loki-linux-amd64.zip"
+    },
+    "promtail-linux-amd64.zip": {
+      "source": "https://github.com/grafana/loki/releases/download/v2.8.2/promtail-linux-amd64.zip",
+      "size": 26174261,
+      "sha256": "f3476f30dfe00168c84e46bc51a58e02304e9b4b43fbd97ad98b6d54e2293d59",
+      "checksum_source": "https://github.com/grafana/loki/releases/download/v2.8.2/SHA256SUMS",
+      "algorithm": "sha256",
+      "verification": "publisher checksum",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792880445.6015065,
+      "path": "stage/s4a/promtail-linux-amd64.zip"
+    },
+    "prometheus-2.44.0.linux-amd64.tar.gz": {
+      "source": "https://github.com/prometheus/prometheus/releases/download/v2.44.0/prometheus-2.44.0.linux-amd64.tar.gz",
+      "size": 90577277,
+      "sha256": "be5c8e43618999c3109c1416e04e4ce25c689f82388db6d275a245fe5b1daae7",
+      "checksum_source": "https://github.com/prometheus/prometheus/releases/download/v2.44.0/sha256sums.txt",
+      "algorithm": "sha256",
+      "verification": "publisher checksum",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792880451.7810593,
+      "path": "stage/s4a/prometheus-2.44.0.linux-amd64.tar.gz"
+    },
+    "systemd_249.11.orig.tar.gz": {
+      "source": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/249.11-0ubuntu3.10/systemd_249.11.orig.tar.gz",
+      "size": 10622702,
+      "sha256": "305ba81cc33593bc2e8e9d6dc7f964b1c0a9303155fced5e6b1d236577441bf2",
+      "checksum_source": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/249.11-0ubuntu3.10/systemd_249.11-0ubuntu3.10.dsc",
+      "algorithm": "sha256",
+      "verification": "publisher checksum",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792880454.6902664,
+      "path": "stage/s4a/systemd_249.11.orig.tar.gz"
+    },
+    "systemd_249.11-0ubuntu3.10.debian.tar.xz": {
+      "source": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/249.11-0ubuntu3.10/systemd_249.11-0ubuntu3.10.debian.tar.xz",
+      "size": 251360,
+      "sha256": "298e151cbb57172e1c5f1fb96cb077a680596a57741332327f2f5046dcc26e34",
+      "checksum_source": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/249.11-0ubuntu3.10/systemd_249.11-0ubuntu3.10.dsc",
+      "algorithm": "sha256",
+      "verification": "publisher checksum",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792880456.5136883,
+      "path": "stage/s4a/systemd_249.11-0ubuntu3.10.debian.tar.xz"
+    },
+    "cilium-1.13.2-source.tar.gz": {
+      "source": "https://codeload.github.com/cilium/cilium/tar.gz/refs/tags/v1.13.2",
+      "size": 38338064,
+      "sha256": "7f3a878a866c2ee809ef3980bdd623a19507f53491c29652bd042381d1d48adb",
+      "checksum_source": null,
+      "algorithm": "sha256",
+      "verification": "generated publisher archive; URL and SHA256 recorded",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792880461.201448,
+      "path": "stage/s4a/cilium-1.13.2-source.tar.gz"
+    },
+    "publisher-gitea-1.19.4-linux-amd64.sha256": {
+      "source": "https://github.com/go-gitea/gitea/releases/download/v1.19.4/gitea-1.19.4-linux-amd64.sha256",
+      "size": 91,
+      "sha256": "20b3b909e6544ce5d64668b871ff08de4c39314567ea3fc7c5326755a801aaba",
+      "checksum_source": "https://github.com/go-gitea/gitea/releases/download/v1.19.4/gitea-1.19.4-linux-amd64.sha256",
+      "algorithm": "sha256",
+      "verification": "publisher checksum",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792880461.2251182,
+      "path": "stage/s4a/publisher-gitea-1.19.4-linux-amd64.sha256"
+    },
+    "publisher-SHA256SUMS": {
+      "source": "https://github.com/grafana/loki/releases/download/v2.8.2/SHA256SUMS",
+      "size": 2654,
+      "sha256": "ffbadfbcedca64d5c093a67680a9fbae60eafbc54583b058b193439fdf4e659c",
+      "checksum_source": "https://github.com/grafana/loki/releases/download/v2.8.2/SHA256SUMS",
+      "algorithm": "sha256",
+      "verification": "publisher checksum",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792880461.2500224,
+      "path": "stage/s4a/publisher-SHA256SUMS"
+    },
+    "publisher-sha256sums.txt": {
+      "source": "https://github.com/prometheus/prometheus/releases/download/v2.44.0/sha256sums.txt",
+      "size": 3519,
+      "sha256": "d48d3883d660bd93ff5b8134e0972d2055e00f62929c6331656d767c1e06a468",
+      "checksum_source": "https://github.com/prometheus/prometheus/releases/download/v2.44.0/sha256sums.txt",
+      "algorithm": "sha256",
+      "verification": "publisher checksum",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792880461.2747498,
+      "path": "stage/s4a/publisher-sha256sums.txt"
+    },
+    "systemd_249.11-0ubuntu3.10.dsc": {
+      "source": "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/systemd/249.11-0ubuntu3.10/systemd_249.11-0ubuntu3.10.dsc",
+      "size": 5932,
+      "sha256": "19446e16f89e2195bc5a74cf928a475868cae14f3b75c4dcd65f6e2377fa8de7",
+      "checksum_source": "publisher descriptor; package archives checked against its SHA256 entries",
+      "algorithm": "sha256",
+      "verification": "publisher checksum",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792880462.4335938,
+      "path": "stage/s4a/systemd_249.11-0ubuntu3.10.dsc"
+    },
+    "kafka-3.4.0-src.tgz.sha512": {
+      "source": "https://archive.apache.org/dist/kafka/3.4.0/kafka-3.4.0-src.tgz.sha512",
+      "size": 207,
+      "sha256": "daabfa389ee906279fc6488b0dc9c31439b6a0660e111d290843e2d2c37d194d",
+      "checksum_source": null,
+      "algorithm": "sha256",
+      "verification": "generated publisher archive; URL and SHA256 recorded",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891316.041194,
+      "path": "stage/s4a/kafka-3.4.0-src.tgz.sha512"
+    },
+    "kafka-3.4.0-src.tgz": {
+      "source": "https://archive.apache.org/dist/kafka/3.4.0/kafka-3.4.0-src.tgz",
+      "size": 10630003,
+      "sha256": "afa2b986a9b39cf67cd4aecb54aee2eaf17e13fb8db03c3145c3aca72c5636e3",
+      "checksum_source": "https://archive.apache.org/dist/kafka/3.4.0/kafka-3.4.0-src.tgz.sha512",
+      "algorithm": "sha256",
+      "verification": "publisher sha512",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891322.4314537,
+      "path": "stage/s4a/kafka-3.4.0-src.tgz",
+      "publisher_algorithm": "sha512",
+      "publisher_checksum": "84e368c6d5e6487ab7a9892a4f7859fa1f7a4c90880706d0b6a855affdf165fd1aa1ae25e098d5ef11f452a71f76e5edab083db98d6eec5ff5e61c69cb65d302"
+    },
+    "apache-zookeeper-3.7.1.tar.gz.sha512": {
+      "source": "https://archive.apache.org/dist/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1.tar.gz.sha512",
+      "size": 159,
+      "sha256": "509c554975698cb9bd8af5948a9ba400a1bd8627c9413f647122f453a5be4d9e",
+      "checksum_source": null,
+      "algorithm": "sha256",
+      "verification": "generated publisher archive; URL and SHA256 recorded",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891323.2260346,
+      "path": "stage/s4a/apache-zookeeper-3.7.1.tar.gz.sha512"
+    },
+    "apache-zookeeper-3.7.1.tar.gz": {
+      "source": "https://archive.apache.org/dist/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1.tar.gz",
+      "size": 3492564,
+      "sha256": "5db2a0ae928d00c8c7b8cf5eb8dc42fa7db3c94837192e30a5b3526d5daeaadd",
+      "checksum_source": "https://archive.apache.org/dist/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1.tar.gz.sha512",
+      "algorithm": "sha256",
+      "verification": "publisher sha512",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891328.7003176,
+      "path": "stage/s4a/apache-zookeeper-3.7.1.tar.gz",
+      "publisher_algorithm": "sha512",
+      "publisher_checksum": "b6d61b013bdf7beb916214167de1b55865e5e463b3b5cac84df97fe044227ab03349a0ef4e657149be7cda161039d069c70d90ad56c87674e6dff5ede227de72"
+    },
+    "postgresql-15.3.tar.bz2.sha256": {
+      "source": "https://ftp.postgresql.org/pub/source/v15.3/postgresql-15.3.tar.bz2.sha256",
+      "size": 90,
+      "sha256": "1e88b05c5a933286801e17709894878c04406cf88d678bafd6f38617c4c6e443",
+      "checksum_source": null,
+      "algorithm": "sha256",
+      "verification": "generated publisher archive; URL and SHA256 recorded",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891329.0691423,
+      "path": "stage/s4a/postgresql-15.3.tar.bz2.sha256"
+    },
+    "postgresql-15.3.tar.bz2": {
+      "source": "https://ftp.postgresql.org/pub/source/v15.3/postgresql-15.3.tar.bz2",
+      "size": 22819107,
+      "sha256": "ffc7d4891f00ffbf5c3f4eab7fbbced8460b8c0ee63c5a5167133b9e6599d932",
+      "checksum_source": "https://ftp.postgresql.org/pub/source/v15.3/postgresql-15.3.tar.bz2.sha256",
+      "algorithm": "sha256",
+      "verification": "publisher checksum",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891331.2014263,
+      "path": "stage/s4a/postgresql-15.3.tar.bz2"
+    },
+    "emqx-5.0.26-source.tar.gz": {
+      "source": "https://codeload.github.com/emqx/emqx/tar.gz/refs/tags/v5.0.26",
+      "size": 2946535,
+      "sha256": "73af5be5bf0415514b7c36cb08ea3e6fc65339b43b4a5d69aec053d001355f54",
+      "checksum_source": null,
+      "algorithm": "sha256",
+      "verification": "generated publisher archive; URL and SHA256 recorded",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891331.8054473,
+      "path": "stage/s4a/emqx-5.0.26-source.tar.gz"
+    },
+    "containerd-1.6.20-source.tar.gz": {
+      "source": "https://codeload.github.com/containerd/containerd/tar.gz/refs/tags/v1.6.20",
+      "size": 8749093,
+      "sha256": "819086ccdca44cfc5f108e226c7a9294d8fad3eb32031a621623da80dedbfb11",
+      "checksum_source": null,
+      "algorithm": "sha256",
+      "verification": "generated publisher archive; URL and SHA256 recorded",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891333.3409874,
+      "path": "stage/s4a/containerd-1.6.20-source.tar.gz"
+    },
+    "kubernetes-1.26.3-source.tar.gz": {
+      "source": "https://codeload.github.com/kubernetes/kubernetes/tar.gz/refs/tags/v1.26.3",
+      "size": 38215855,
+      "sha256": "e9db7e0a2e8cb40e478564de22530c5e582ae7136558994130b3ae7d8828ab31",
+      "checksum_source": null,
+      "algorithm": "sha256",
+      "verification": "generated publisher archive; URL and SHA256 recorded",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891339.6749024,
+      "path": "stage/s4a/kubernetes-1.26.3-source.tar.gz"
+    },
+    "kafka-python-2.0.2-source.tar.gz": {
+      "source": "https://codeload.github.com/dpkp/kafka-python/tar.gz/refs/tags/2.0.2",
+      "size": 327238,
+      "sha256": "5dcf87c559e7aee4f18d621a02e247db3e3552ee4589ca611d51eef87b37efed",
+      "checksum_source": null,
+      "algorithm": "sha256",
+      "verification": "generated publisher archive; URL and SHA256 recorded",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891340.1681852,
+      "path": "stage/s4a/kafka-python-2.0.2-source.tar.gz"
+    },
+    "org.eclipse.paho.client.mqttv3-1.2.5-sources.jar.sha1": {
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/paho/org.eclipse.paho.client.mqttv3/1.2.5/org.eclipse.paho.client.mqttv3-1.2.5-sources.jar.sha1",
+      "size": 40,
+      "sha256": "f92fbe0c1d5f6ef036fb1cc831276fe034f9c664b5fcd4a6501abd940932851c",
+      "checksum_source": null,
+      "algorithm": "sha256",
+      "verification": "generated publisher archive; URL and SHA256 recorded",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891340.2454016,
+      "path": "stage/s4a/org.eclipse.paho.client.mqttv3-1.2.5-sources.jar.sha1"
+    },
+    "org.eclipse.paho.client.mqttv3-1.2.5-sources.jar": {
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/paho/org.eclipse.paho.client.mqttv3/1.2.5/org.eclipse.paho.client.mqttv3-1.2.5-sources.jar",
+      "size": 245037,
+      "sha256": "ba578ccc2bbf9770a32fa922f96c05b0c1ce18f89b1caa8ad179deea914c7ab1",
+      "checksum_source": "https://repo.maven.apache.org/maven2/org/eclipse/paho/org.eclipse.paho.client.mqttv3/1.2.5/org.eclipse.paho.client.mqttv3-1.2.5-sources.jar.sha1",
+      "algorithm": "sha256",
+      "verification": "publisher sha1",
+      "approval": "rounds/overnight/APPROVALS.md",
+      "fetched_host_epoch": 1792891340.2859833,
+      "path": "stage/s4a/org.eclipse.paho.client.mqttv3-1.2.5-sources.jar",
+      "publisher_algorithm": "sha1",
+      "publisher_checksum": "84b4c91988da0a6e20ae5ac622b3b053492ecb51"
+    }
+  }
+}

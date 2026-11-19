@@ -1,0 +1,7 @@
+# Host pools and the generation each pool runs.
+pools:
+  control: {generation: g-control, hosts: [us-parent-01, eu-parent-01]}
+  steady: {generation: g-steady, hosts: [us-work-03, eu-work-02, eu-work-03]}
+  elastic: {generation: g-elastic, hosts: [us-work-01, us-work-02, eu-work-01]}
+  ops: {generation: g-ops, hosts: [ops-helper-01]}
+  burst-2025: {generation: g-burst, hosts: []}

@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: service-resources
+spec:
+  hard:
+    limits.cpu: {{ .Values.quota.cpu | quote }}
+    limits.memory: {{ .Values.quota.memory | quote }}
+    requests.storage: {{ .Values.quota.storage | quote }}
+    pods: "120"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: container-resources
+spec:
+  limits:
+    - type: Container
+      default: {cpu: 500m, memory: 512Mi}
+      defaultRequest: {cpu: 50m, memory: 64Mi}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: database-routes}
+data:
+  database-routes.json: {{ toJson .Values.databaseRoutes | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: worker-database-routes}
+data:
+  database-routes.json: {{ toJson (.Values.workerDatabaseRoutes | default .Values.databaseRoutes) | quote }}

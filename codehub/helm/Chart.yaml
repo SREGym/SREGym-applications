@@ -1,0 +1,6 @@
+apiVersion: v2
+name: codehub
+description: Regional source hosting and durable development workflows
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

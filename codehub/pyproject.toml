@@ -1,0 +1,34 @@
+[project]
+name = "codehub"
+version = "0.1.0"
+description = "Regional source collaboration services"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi==0.115.12",
+  "uvicorn==0.34.2",
+  "PyMySQL==1.1.1",
+  "pika==1.3.2",
+  "httpx==0.28.1",
+  "cryptography==44.0.3",
+  "opentelemetry-sdk==1.32.1",
+  "opentelemetry-exporter-otlp-proto-http==1.32.1",
+]
+
+[dependency-groups]
+dev = ["pytest==8.3.5", "ruff==0.14.1"]
+
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/codehub"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = ["integration: requires a dedicated live MySQL database"]

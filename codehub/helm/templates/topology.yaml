@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: topology}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: topology-routing}
+rules:
+  - apiGroups: [""]
+    resources: [services]
+    resourceNames: [mysql-g0-writer-route]
+    verbs: [get, patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: topology-routing}
+subjects: [{kind: ServiceAccount, name: topology}]
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: topology-routing}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: topology-config}
+data:
+  topology.json: |
+    {
+      "writer_host": {{ .Values.mysql.primaryHost | quote }},
+      "candidate_host": "mysql-g0-candidate.codehub-region-b.svc.cluster.local",
+      "routing_service": "mysql-g0-writer-route",
+      "database": {{ .Values.mysql.database | quote }},
+      "automatic_promotion": {{ .Values.topology.automaticPromotion }},
+      "failure_threshold": {{ .Values.topology.failureThreshold }},
+      "probe_interval_seconds": {{ .Values.topology.probeIntervalSeconds }},
+      "maximum_lag_seconds": {{ .Values.topology.maximumLagSeconds }}
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: topology}
+spec:
+  replicas: 1
+  # One process owns the persistent promotion state. Replacement must not run
+  # a second writer against the same volume or need a temporary surge pod.
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: topology}}
+  template:
+    metadata:
+      labels:
+        {{- include "codehub.labels" . | nindent 8 }}
+        app.kubernetes.io/component: topology
+    spec:
+      serviceAccountName: topology
+      securityContext:
+        {{- include "codehub.security" . | nindent 8 }}
+      {{- include "codehub.placement" (dict "root" . "component" "topology") | nindent 6 }}
+      containers:
+        - name: topology
+          image: {{ .Values.image.repository | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: [python, -m, codehub.topology]
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          env:
+            - {name: CODEHUB_TOPOLOGY_CONFIG_FILE, value: /etc/codehub/topology.json}
+            - {name: CODEHUB_MYSQL_ADMIN_PASSWORD_FILE, value: /run/credentials/mysql-root-password}
+            - {name: CODEHUB_SERVICE_TOKEN_FILE, value: /run/credentials/service-token}
+            - {name: CODEHUB_DATA_DIR, value: /var/lib/codehub}
+            - {name: POD_NAMESPACE, valueFrom: {fieldRef: {fieldPath: metadata.namespace}}}
+          ports: [{name: http, containerPort: 8080}]
+          readinessProbe: {httpGet: {path: /healthz, port: http}, periodSeconds: 3}
+          resources:
+            {{- toYaml .Values.topology.resources | nindent 12 }}
+          volumeMounts:
+            - {name: config, mountPath: /etc/codehub, readOnly: true}
+            - {name: credentials, mountPath: /run/credentials, readOnly: true}
+            - {name: data, mountPath: /var/lib/codehub}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - {name: config, configMap: {name: topology-config}}
+        - {name: credentials, secret: {secretName: {{ .Values.credentialsSecret }}, defaultMode: 0440}}
+        - {name: data, persistentVolumeClaim: {claimName: topology-data}}
+        - {name: tmp, emptyDir: {sizeLimit: 64Mi}}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: topology-data}
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: {{ .Values.storageClass | quote }}
+  resources: {requests: {storage: {{ .Values.topology.storage | quote }}}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: topology}
+spec:
+  selector: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: topology}
+  ports: [{name: http, port: 8080, targetPort: http}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: topology-control-egress}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: topology}}
+  policyTypes: [Egress]
+  egress:
+    - ports: [{protocol: TCP, port: 443}, {protocol: TCP, port: 6443}]

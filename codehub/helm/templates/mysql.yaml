@@ -1,0 +1,108 @@
+{{- range .Values.mysql.instances }}
+{{- $instance := . }}
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: {{ .name }}-config}
+data:
+  replication.cnf: |
+    [mysqld]
+    server_id={{ .serverId }}
+    gtid_mode=ON
+    enforce_gtid_consistency=ON
+    log_bin=mysql-bin
+    log_replica_updates=ON
+    binlog_format=ROW
+    sync_binlog=1
+    innodb_flush_log_at_trx_commit=1
+    innodb_read_io_threads=4
+    innodb_write_io_threads=4
+    binlog_expire_logs_seconds=259200
+    skip_replica_start=ON
+    read_only={{ if .writable }}OFF{{ else }}ON{{ end }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: {name: {{ .name }}}
+spec:
+  serviceName: {{ .name }}
+  replicas: 1
+  selector: {matchLabels: {app.kubernetes.io/name: codehub, database-member: {{ .name }}}}
+  template:
+    metadata:
+      labels:
+        {{- include "codehub.labels" $ | nindent 8 }}
+        database-member: {{ .name }}
+        database-group: {{ index (splitList "-" .name) 1 }}
+        app.kubernetes.io/component: mysql
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 999, runAsGroup: 999, fsGroup: 999, seccompProfile: {type: RuntimeDefault}}
+      {{- include "codehub.placement" (dict "root" $ "component" "mysql" "group" (index (splitList "-" .name) 1)) | nindent 6 }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector: {matchLabels: {app.kubernetes.io/name: codehub, app.kubernetes.io/component: mysql, database-group: {{ index (splitList "-" .name) 1 }}}}
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: mysql
+          image: {{ $.Values.mysql.image | quote }}
+          securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+          env:
+            - {name: MYSQL_ROOT_PASSWORD_FILE, value: /run/credentials/mysql-root-password}
+            - {name: MYSQL_ROOT_HOST, value: "%"}
+            - {name: MYSQL_DATABASE, value: {{ $.Values.mysql.database | quote }}}
+            - {name: MYSQL_USER, value: {{ $.Values.mysql.user | quote }}}
+            - {name: MYSQL_PASSWORD_FILE, value: /run/credentials/mysql-password}
+          ports: [{name: mysql, containerPort: 3306}]
+          startupProbe:
+            exec: {command: [sh, -c, 'MYSQL_PWD="$(cat /run/credentials/mysql-root-password)" mysql --protocol=TCP -h127.0.0.1 -uroot -e "SELECT 1"']}
+            periodSeconds: 3
+            timeoutSeconds: 10
+            failureThreshold: 100
+          readinessProbe:
+            exec: {command: [sh, -c, 'MYSQL_PWD="$(cat /run/credentials/mysql-root-password)" mysql --protocol=TCP -h127.0.0.1 -uroot -e "SELECT 1"']}
+            periodSeconds: 3
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml $.Values.mysql.resources | nindent 12 }}
+          volumeMounts:
+            - {name: data, mountPath: /var/lib/mysql}
+            - {name: config, mountPath: /etc/mysql/conf.d/replication.cnf, subPath: replication.cnf, readOnly: true}
+            - {name: credentials, mountPath: /run/credentials, readOnly: true}
+      volumes:
+        - {name: config, configMap: {name: {{ .name }}-config}}
+        - {name: credentials, secret: {secretName: {{ $.Values.credentialsSecret }}, defaultMode: 0440}}
+  volumeClaimTemplates:
+    - metadata: {name: data}
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: {{ $.Values.storageClass | quote }}
+        resources: {requests: {storage: {{ $.Values.mysql.storage | quote }}}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: {{ .name }}}
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector: {app.kubernetes.io/name: codehub, database-member: {{ .name }}}
+  ports: [{name: mysql, port: 3306, targetPort: mysql}]
+---
+{{- end }}
+apiVersion: v1
+kind: Service
+metadata: {name: mysql-writer}
+spec:
+  type: ExternalName
+  externalName: {{ .Values.mysql.primaryHost }}
+  ports: [{name: mysql, port: 3306}]
+{{- range .Values.mysql.writerRoutes }}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: {{ .name }}}
+spec:
+  type: ExternalName
+  externalName: {{ .host }}
+  ports: [{name: mysql, port: 3306}]
+{{- end }}

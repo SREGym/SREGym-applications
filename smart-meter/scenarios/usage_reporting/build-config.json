@@ -1,0 +1,883 @@
+{
+  "memory_mib": {
+    "us-parent-01": 2048,
+    "us-work-01": 3072,
+    "us-work-02": 3072,
+    "us-work-03": 2048,
+    "eu-parent-01": 2048,
+    "eu-work-01": 2048,
+    "eu-work-02": 3072,
+    "eu-work-03": 3072
+  },
+  "outside_reserve_mib": 2048,
+  "private_client_mib": 1024,
+  "objects": [
+    {
+      "name": "images/coredns.tar",
+      "bytes": 14839296,
+      "sha256": "1ac6033b2c1a226c1af417460e660f9b28179e6944ca3955bd2df00f8306309a",
+      "former_host_path": "@WORLD@/images/coredns.tar"
+    },
+    {
+      "name": "images/emqx.tar",
+      "bytes": 168159744,
+      "sha256": "d3402515b9b21c67e314b101a63646fa1ab32d5d94304c40569ef0c6bd78db27",
+      "former_host_path": "@WORLD@/images/emqx.tar"
+    },
+    {
+      "name": "images/etcd.tar",
+      "bytes": 101642240,
+      "sha256": "8793975f48be5e7f2d62ebacf3f0317a5af7a96f4bf49cf7837a2e89075829c1",
+      "former_host_path": "@WORLD@/images/etcd.tar"
+    },
+    {
+      "name": "images/kube-apiserver.tar",
+      "bytes": 35361792,
+      "sha256": "3fdb1e0ff61baba9ab3cd038cab15f1559b52bc7dde2f9d411189d6ed067dafc",
+      "former_host_path": "@WORLD@/images/kube-apiserver.tar"
+    },
+    {
+      "name": "images/kube-controller-manager.tar",
+      "bytes": 32209408,
+      "sha256": "ddeaf71ba3e74622ac83f268d098fd4b21724825109fcd10d0ed3feac93879b4",
+      "former_host_path": "@WORLD@/images/kube-controller-manager.tar"
+    },
+    {
+      "name": "images/kube-proxy.tar",
+      "bytes": 21545984,
+      "sha256": "2b280a9f908ccbd4a21e16a71d92cd65b0ddaf52a7f5ae9c6521509b1bf7e6cd",
+      "former_host_path": "@WORLD@/images/kube-proxy.tar"
+    },
+    {
+      "name": "images/kube-scheduler.tar",
+      "bytes": 17519616,
+      "sha256": "2fde0d37b1c9f8a3f8daacec23894eef21c9b525e67bf0d1078164806062fd2c",
+      "former_host_path": "@WORLD@/images/kube-scheduler.tar"
+    },
+    {
+      "name": "images/pause.tar",
+      "bytes": 322048,
+      "sha256": "3959851be8d0cb6d3080caccf1643c4733cccb7ffae335045fd8dc8a2e57b1cf",
+      "former_host_path": "@WORLD@/images/pause.tar"
+    },
+    {
+      "name": "images/postgres.tar",
+      "bytes": 148886528,
+      "sha256": "01cc49ce94f8944f2ef9edc2d6444f160c8bad06886fc0de0418168f24f9adfb",
+      "former_host_path": "@WORLD@/images/postgres.tar"
+    },
+    {
+      "name": "images/python.tar",
+      "bytes": 48859136,
+      "sha256": "060b7cdaefade8870ba40e8675ebebd6d0c1e3dab52302012dca9dd15a7ad22f",
+      "former_host_path": "@WORLD@/images/python.tar"
+    },
+    {
+      "name": "images/temurin.tar",
+      "bytes": 95118336,
+      "sha256": "b61d1710de391fada7db2e788b227d43cf7cb2211aca7e75eabcbf79dd2f515c",
+      "former_host_path": "@WORLD@/images/temurin.tar"
+    },
+    {
+      "name": "stage/MANIFEST.json",
+      "bytes": 24331,
+      "sha256": "2364c8da16e430c6d9e9851e47610e505e9b442223e7635794d9c769c89da65b",
+      "former_host_path": "@WORLD@/stage/MANIFEST.json"
+    },
+    {
+      "name": "stage/apache-zookeeper-3.7.1-bin.tar.gz",
+      "bytes": 12649765,
+      "sha256": "dedf166f9a5fb12240041385a74ec81ce9de63f2a49454883027cf6acae202a5",
+      "former_host_path": "@WORLD@/stage/apache-zookeeper-3.7.1-bin.tar.gz"
+    },
+    {
+      "name": "stage/asn1crypto-1.5.1-py2.py3-none-any.whl",
+      "bytes": 105045,
+      "sha256": "db4e40728b728508912cbb3d44f19ce188f218e9eba635821bb4b68564f8fd67",
+      "former_host_path": "@WORLD@/stage/asn1crypto-1.5.1-py2.py3-none-any.whl"
+    },
+    {
+      "name": "stage/cilium-1.13.2.tgz",
+      "bytes": 118935,
+      "sha256": "a531fb73dd654b501b09305a7e77248082b45f999786a1018263bd514aed2fb7",
+      "former_host_path": "@WORLD@/stage/cilium-1.13.2.tgz"
+    },
+    {
+      "name": "stage/cni-plugins-linux-amd64-v1.2.0.tgz",
+      "bytes": 40517426,
+      "sha256": "f3a841324845ca6bf0d4091b4fc7f97e18a623172158b72fc3fdcdb9d42d2d37",
+      "former_host_path": "@WORLD@/stage/cni-plugins-linux-amd64-v1.2.0.tgz"
+    },
+    {
+      "name": "stage/containerd-1.6.20-linux-amd64.tar.gz",
+      "bytes": 44102774,
+      "sha256": "bb9a9ccd6517e2a54da748a9f60dc9aa9d79d19d4724663f2386812f083968e2",
+      "former_host_path": "@WORLD@/stage/containerd-1.6.20-linux-amd64.tar.gz"
+    },
+    {
+      "name": "stage/crictl-v1.26.1-linux-amd64.tar.gz",
+      "bytes": 23410699,
+      "sha256": "0c1a0f9900c15ee7a55e757bcdc220faca5dd2e1cfc120459ad1f04f08598127",
+      "former_host_path": "@WORLD@/stage/crictl-v1.26.1-linux-amd64.tar.gz"
+    },
+    {
+      "name": "stage/helm.tar.gz",
+      "bytes": 15489735,
+      "sha256": "ca2d5d40d4cdfb9a3a6205dd803b5bc8def00bd2f13e5526c127e9b667974a89",
+      "former_host_path": "@WORLD@/stage/helm.tar.gz"
+    },
+    {
+      "name": "stage/index-jammy-updates-20230918T000000Z/InRelease",
+      "bytes": 118747,
+      "sha256": "c0838f35f040e64cecdef01242184184311dbc5991767a091a01e0af7fe96077",
+      "former_host_path": "@WORLD@/stage/index-jammy-updates-20230918T000000Z/InRelease"
+    },
+    {
+      "name": "stage/index-jammy-updates-20230918T000000Z/Packages.xz",
+      "bytes": 973496,
+      "sha256": "451e89021923caf500b5476ed7c96113ef156b65d66d1aed4b286939fa695f53",
+      "former_host_path": "@WORLD@/stage/index-jammy-updates-20230918T000000Z/Packages.xz"
+    },
+    {
+      "name": "stage/index-jammy-updates-20230918T000000Z/signature-verification.txt",
+      "bytes": 583,
+      "sha256": "d4c7bf6e3f5c5ee078da106706a7b5013b4a2b300d1a19d7ace94af0e057d829",
+      "former_host_path": "@WORLD@/stage/index-jammy-updates-20230918T000000Z/signature-verification.txt"
+    },
+    {
+      "name": "stage/kafka_2.13-3.4.0.tgz",
+      "bytes": 106290956,
+      "sha256": "67025feb03eb963a8852d4adc5b2810744f493a672c5992728955e38bed43da8",
+      "former_host_path": "@WORLD@/stage/kafka_2.13-3.4.0.tgz"
+    },
+    {
+      "name": "stage/kafka_python-2.0.2-py2.py3-none-any.whl",
+      "bytes": 246508,
+      "sha256": "2d92418c7cb1c298fa6c7f0fb3519b520d0d7526ac6cb7ae2a4fc65a51a94b6e",
+      "former_host_path": "@WORLD@/stage/kafka_python-2.0.2-py2.py3-none-any.whl"
+    },
+    {
+      "name": "stage/kubeadm",
+      "bytes": 46776320,
+      "sha256": "87a1bf6603e252a8fa46be44382ea218cb8e4f066874d149dc589d0f3a405fed",
+      "former_host_path": "@WORLD@/stage/kubeadm"
+    },
+    {
+      "name": "stage/kubectl",
+      "bytes": 48037888,
+      "sha256": "026c8412d373064ab0359ed0d1a25c975e9ce803a093d76c8b30c5996ad73e75",
+      "former_host_path": "@WORLD@/stage/kubectl"
+    },
+    {
+      "name": "stage/kubelet",
+      "bytes": 121272536,
+      "sha256": "992d6298bd494b65f54c838419773c4976aca72dfb36271c613537efae7ab7d2",
+      "former_host_path": "@WORLD@/stage/kubelet"
+    },
+    {
+      "name": "stage/netplan-0.105/RECEIPT.json",
+      "bytes": 1433,
+      "sha256": "8d50f74ee75845ba52763508f710b2f7fc28e1a1a72d3b93366d8a78d8440b5e",
+      "former_host_path": "@WORLD@/stage/netplan-0.105/RECEIPT.json"
+    },
+    {
+      "name": "stage/netplan-0.105/SHA256SUMS",
+      "bytes": 221,
+      "sha256": "a4690b95d8ff37b08e5d71b83db08ea2903dc6292b9bedf0a8b06d029be61cbe",
+      "former_host_path": "@WORLD@/stage/netplan-0.105/SHA256SUMS"
+    },
+    {
+      "name": "stage/netplan-0.105/libnetplan0_0.105-0ubuntu2~22.04.3_amd64.deb",
+      "bytes": 102686,
+      "sha256": "8c50fef6a5effb9f99eaacffa6ca356bc48029f19f2d4f086b4f6161fde994f6",
+      "former_host_path": "@WORLD@/stage/netplan-0.105/libnetplan0_0.105-0ubuntu2~22.04.3_amd64.deb"
+    },
+    {
+      "name": "stage/netplan-0.105/netplan.io_0.105-0ubuntu2~22.04.3_amd64.deb",
+      "bytes": 92940,
+      "sha256": "43f222cfdbf5369a70904476268ae36a3bf9670cf1efaaf34321bbeb595b29d1",
+      "former_host_path": "@WORLD@/stage/netplan-0.105/netplan.io_0.105-0ubuntu2~22.04.3_amd64.deb"
+    },
+    {
+      "name": "stage/paho-java-1.2.5/RECEIPT.json",
+      "bytes": 417,
+      "sha256": "578252f54d1ca5d585d0130f9537f894753dfd74acf16306c9c84f00c00b8f64",
+      "former_host_path": "@WORLD@/stage/paho-java-1.2.5/RECEIPT.json"
+    },
+    {
+      "name": "stage/paho-java-1.2.5/SHA256SUMS",
+      "bytes": 107,
+      "sha256": "09f892f55ce1a4f32b6a97afecca208289ce5166fab5d5a10a3bc2f36c8ec8cd",
+      "former_host_path": "@WORLD@/stage/paho-java-1.2.5/SHA256SUMS"
+    },
+    {
+      "name": "stage/paho-java-1.2.5/org.eclipse.paho.client.mqttv3-1.2.5.jar",
+      "bytes": 241861,
+      "sha256": "59914287adac506a28d5e8172eed262a22605f3df4d426b9d92f41dae2448185",
+      "former_host_path": "@WORLD@/stage/paho-java-1.2.5/org.eclipse.paho.client.mqttv3-1.2.5.jar"
+    },
+    {
+      "name": "stage/paho-mqtt-1.6.1.tar.gz",
+      "bytes": 99373,
+      "sha256": "2a8291c81623aec00372b5a85558a372c747cbca8e9934dfe218638b8eefc26f",
+      "former_host_path": "@WORLD@/stage/paho-mqtt-1.6.1.tar.gz"
+    },
+    {
+      "name": "stage/pg8000-1.29.8-py3-none-any.whl",
+      "bytes": 53486,
+      "sha256": "962e9d6687f76057bd6d9c9c0f67f503a503216bf60b3a4d71e4cb8c97f8326d",
+      "former_host_path": "@WORLD@/stage/pg8000-1.29.8-py3-none-any.whl"
+    },
+    {
+      "name": "stage/preflight-reused/RECEIPT.json",
+      "bytes": 1104,
+      "sha256": "dfd71fc48f16416e34bed184b06e0c205f01a5cff8d0211ac0e803ec3d230701",
+      "former_host_path": "@WORLD@/stage/preflight-reused/RECEIPT.json"
+    },
+    {
+      "name": "stage/preflight-reused/SHA256SUMS",
+      "bytes": 407,
+      "sha256": "99b515c6d49414e71b5fdde81f7034cba12b779e1a1c3063417b9b1bda02d253",
+      "former_host_path": "@WORLD@/stage/preflight-reused/SHA256SUMS"
+    },
+    {
+      "name": "stage/preflight-reused/conntrack_1%3a1.4.6-2build2_amd64.deb",
+      "bytes": 33512,
+      "sha256": "5a1cde0f56b3e5ccbf10b54cfec180abde8221a64eb703e2338241655d6cfe4a",
+      "former_host_path": "@WORLD@/stage/preflight-reused/conntrack_1%3a1.4.6-2build2_amd64.deb"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-backports_main_binary-amd64_Packages",
+      "bytes": 449659,
+      "sha256": "b1ff365f2ad07d8d76d099461be490e214cc43d3c2fa3a398fb2b2d3546939d1",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-backports_main_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-backports_universe_binary-amd64_Packages",
+      "bytes": 147178,
+      "sha256": "453ca3266fe8f0f1d2f0b30e3ac0eb992dbaa3ae58eb789fb3177454fc290c54",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-backports_universe_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_InRelease",
+      "bytes": 128049,
+      "sha256": "25f0390bac631530a4ba080c4cf4ec7d3b9cdac211d84588637f31c28a62142c",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_InRelease"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_main_binary-amd64_Packages",
+      "bytes": 22099041,
+      "sha256": "a7a364bd22bc89a614ad4af9e8835623a17ec584ace7316c2f20cb4967472090",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_main_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_multiverse_binary-amd64_Packages",
+      "bytes": 621351,
+      "sha256": "21c0aa9bbc144b6675c0cc36503112b583c53c12e16e4905d730228f47d80cbb",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_multiverse_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_restricted_binary-amd64_Packages",
+      "bytes": 39252467,
+      "sha256": "7a1a2d74a9bc4733851802116023512f51f05d9cb631daf5378507454d0becc4",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_restricted_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_universe_binary-amd64_Packages",
+      "bytes": 7298445,
+      "sha256": "99bfef779b0c53534b5e41b79fb7a0f6a721d28f3796e264c4f0a3e907e6c48c",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_universe_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_InRelease",
+      "bytes": 270087,
+      "sha256": "c14060cd8c6d625874dfcb9523a35a395bf4865c28b6b6a82569ef326fe92dc6",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_InRelease"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_main_binary-amd64_Packages",
+      "bytes": 6779186,
+      "sha256": "12ce0797a6ed39a1fee1321985976c6b78872a8fe4c7ef2fb712f2364c9839a3",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_main_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_multiverse_binary-amd64_Packages",
+      "bytes": 918002,
+      "sha256": "3493e180d952143ec601e4c833e54de709473bd636b6a3f6bb94e367e56f4abf",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_multiverse_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_restricted_binary-amd64_Packages",
+      "bytes": 915647,
+      "sha256": "b40bcc8340f4a2295e3daa158b7c50001642e843b3559907402c1b0da2d2459b",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_restricted_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_universe_binary-amd64_Packages",
+      "bytes": 64332414,
+      "sha256": "6b8cc68643d18250ab297c4f6d427a8778b1d1534e1a3033fff0f221fa20a419",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_universe_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_InRelease",
+      "bytes": 128927,
+      "sha256": "dc91ff4d2ceabe95dae316c6f6c0308992edaca1c579bac1e56759866d714f73",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_InRelease"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_main_binary-amd64_Packages",
+      "bytes": 20698557,
+      "sha256": "264a20017070a050d8edf01e0d161d3c4eaae1513838fc9223a058b8b4e14bf2",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_main_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_multiverse_binary-amd64_Packages",
+      "bytes": 593046,
+      "sha256": "21d241e5d8d4dc9ee972979b79160bda40582a827671f09a35ab6be17cdaa206",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_multiverse_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_restricted_binary-amd64_Packages",
+      "bytes": 37850959,
+      "sha256": "ddcf260acc796a545624913b5d575668e94894123451b04a38ccc7de3af42e00",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_restricted_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/copied/var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_universe_binary-amd64_Packages",
+      "bytes": 6214130,
+      "sha256": "cdaa876cb7a82ffbf3f0ff6e5ae8383365a9fad4e6a23b53cda073cf47ea33a6",
+      "former_host_path": "@WORLD@/stage/preflight-reused/copied/var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_universe_binary-amd64_Packages"
+    },
+    {
+      "name": "stage/preflight-reused/ebtables_2.0.11-4build2_amd64.deb",
+      "bytes": 84856,
+      "sha256": "5c41f4c1465ca0bfe5a470ffb8b0cf913d151db559097fe561b345e9f64e6181",
+      "former_host_path": "@WORLD@/stage/preflight-reused/ebtables_2.0.11-4build2_amd64.deb"
+    },
+    {
+      "name": "stage/preflight-reused/ethtool_1%3a5.16-1ubuntu0.2_amd64.deb",
+      "bytes": 208180,
+      "sha256": "62e2f73f33b1d6271cf8c72f5657be6748d74e454b41848fa8b15173b3df8454",
+      "former_host_path": "@WORLD@/stage/preflight-reused/ethtool_1%3a5.16-1ubuntu0.2_amd64.deb"
+    },
+    {
+      "name": "stage/preflight-reused/socat_1.7.4.1-3ubuntu4_amd64.deb",
+      "bytes": 349118,
+      "sha256": "aec6c231f65564cb75c9c2e5c3ce0739482688f373f141471ecf9276fc03df67",
+      "former_host_path": "@WORLD@/stage/preflight-reused/socat_1.7.4.1-3ubuntu4_amd64.deb"
+    },
+    {
+      "name": "stage/python_dateutil-2.8.2-py2.py3-none-any.whl",
+      "bytes": 247702,
+      "sha256": "961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9",
+      "former_host_path": "@WORLD@/stage/python_dateutil-2.8.2-py2.py3-none-any.whl"
+    },
+    {
+      "name": "stage/runc.amd64",
+      "bytes": 9431456,
+      "sha256": "f00b144e86f8c1db347a2e8f22caade07d55382c5f76dd5c0a5b1ab64eaec8bb",
+      "former_host_path": "@WORLD@/stage/runc.amd64"
+    },
+    {
+      "name": "stage/sources/apache-zookeeper-3.7.1.tar.gz",
+      "bytes": 3492564,
+      "sha256": "5db2a0ae928d00c8c7b8cf5eb8dc42fa7db3c94837192e30a5b3526d5daeaadd",
+      "former_host_path": "@WORLD@/stage/sources/apache-zookeeper-3.7.1.tar.gz"
+    },
+    {
+      "name": "stage/sources/apache-zookeeper-3.7.1.tar.gz.sha512",
+      "bytes": 159,
+      "sha256": "509c554975698cb9bd8af5948a9ba400a1bd8627c9413f647122f453a5be4d9e",
+      "former_host_path": "@WORLD@/stage/sources/apache-zookeeper-3.7.1.tar.gz.sha512"
+    },
+    {
+      "name": "stage/sources/cilium-1.13.2-source.tar.gz",
+      "bytes": 38338064,
+      "sha256": "7f3a878a866c2ee809ef3980bdd623a19507f53491c29652bd042381d1d48adb",
+      "former_host_path": "@WORLD@/stage/sources/cilium-1.13.2-source.tar.gz"
+    },
+    {
+      "name": "stage/sources/containerd-1.6.20-source.tar.gz",
+      "bytes": 8749093,
+      "sha256": "819086ccdca44cfc5f108e226c7a9294d8fad3eb32031a621623da80dedbfb11",
+      "former_host_path": "@WORLD@/stage/sources/containerd-1.6.20-source.tar.gz"
+    },
+    {
+      "name": "stage/sources/emqx-5.0.26-source.tar.gz",
+      "bytes": 2946535,
+      "sha256": "73af5be5bf0415514b7c36cb08ea3e6fc65339b43b4a5d69aec053d001355f54",
+      "former_host_path": "@WORLD@/stage/sources/emqx-5.0.26-source.tar.gz"
+    },
+    {
+      "name": "stage/sources/gitea-1.19.4-linux-amd64",
+      "bytes": 125779040,
+      "sha256": "bf68e8e39c70dc54a7876527d463b517f8af51a2d2924511cd047f479cd8aefd",
+      "former_host_path": "@WORLD@/stage/sources/gitea-1.19.4-linux-amd64"
+    },
+    {
+      "name": "stage/sources/kafka-3.4.0-src.tgz",
+      "bytes": 10630003,
+      "sha256": "afa2b986a9b39cf67cd4aecb54aee2eaf17e13fb8db03c3145c3aca72c5636e3",
+      "former_host_path": "@WORLD@/stage/sources/kafka-3.4.0-src.tgz"
+    },
+    {
+      "name": "stage/sources/kafka-3.4.0-src.tgz.sha512",
+      "bytes": 207,
+      "sha256": "daabfa389ee906279fc6488b0dc9c31439b6a0660e111d290843e2d2c37d194d",
+      "former_host_path": "@WORLD@/stage/sources/kafka-3.4.0-src.tgz.sha512"
+    },
+    {
+      "name": "stage/sources/kafka-python-2.0.2-source.tar.gz",
+      "bytes": 327238,
+      "sha256": "5dcf87c559e7aee4f18d621a02e247db3e3552ee4589ca611d51eef87b37efed",
+      "former_host_path": "@WORLD@/stage/sources/kafka-python-2.0.2-source.tar.gz"
+    },
+    {
+      "name": "stage/sources/kubernetes-1.26.3-source.tar.gz",
+      "bytes": 38215855,
+      "sha256": "e9db7e0a2e8cb40e478564de22530c5e582ae7136558994130b3ae7d8828ab31",
+      "former_host_path": "@WORLD@/stage/sources/kubernetes-1.26.3-source.tar.gz"
+    },
+    {
+      "name": "stage/sources/loki-linux-amd64.zip",
+      "bytes": 18930096,
+      "sha256": "ed5582a8945e7b215932d196f474f812db07cb92db3685c5fbd95300414e0918",
+      "former_host_path": "@WORLD@/stage/sources/loki-linux-amd64.zip"
+    },
+    {
+      "name": "stage/sources/org.eclipse.paho.client.mqttv3-1.2.5-sources.jar",
+      "bytes": 245037,
+      "sha256": "ba578ccc2bbf9770a32fa922f96c05b0c1ce18f89b1caa8ad179deea914c7ab1",
+      "former_host_path": "@WORLD@/stage/sources/org.eclipse.paho.client.mqttv3-1.2.5-sources.jar"
+    },
+    {
+      "name": "stage/sources/org.eclipse.paho.client.mqttv3-1.2.5-sources.jar.sha1",
+      "bytes": 40,
+      "sha256": "f92fbe0c1d5f6ef036fb1cc831276fe034f9c664b5fcd4a6501abd940932851c",
+      "former_host_path": "@WORLD@/stage/sources/org.eclipse.paho.client.mqttv3-1.2.5-sources.jar.sha1"
+    },
+    {
+      "name": "stage/sources/postgresql-15.3.tar.bz2",
+      "bytes": 22819107,
+      "sha256": "ffc7d4891f00ffbf5c3f4eab7fbbced8460b8c0ee63c5a5167133b9e6599d932",
+      "former_host_path": "@WORLD@/stage/sources/postgresql-15.3.tar.bz2"
+    },
+    {
+      "name": "stage/sources/postgresql-15.3.tar.bz2.sha256",
+      "bytes": 90,
+      "sha256": "1e88b05c5a933286801e17709894878c04406cf88d678bafd6f38617c4c6e443",
+      "former_host_path": "@WORLD@/stage/sources/postgresql-15.3.tar.bz2.sha256"
+    },
+    {
+      "name": "stage/sources/prometheus-2.44.0.linux-amd64.tar.gz",
+      "bytes": 90577277,
+      "sha256": "be5c8e43618999c3109c1416e04e4ce25c689f82388db6d275a245fe5b1daae7",
+      "former_host_path": "@WORLD@/stage/sources/prometheus-2.44.0.linux-amd64.tar.gz"
+    },
+    {
+      "name": "stage/sources/promtail-linux-amd64.zip",
+      "bytes": 26174261,
+      "sha256": "f3476f30dfe00168c84e46bc51a58e02304e9b4b43fbd97ad98b6d54e2293d59",
+      "former_host_path": "@WORLD@/stage/sources/promtail-linux-amd64.zip"
+    },
+    {
+      "name": "stage/sources/publisher-SHA256SUMS",
+      "bytes": 2654,
+      "sha256": "ffbadfbcedca64d5c093a67680a9fbae60eafbc54583b058b193439fdf4e659c",
+      "former_host_path": "@WORLD@/stage/sources/publisher-SHA256SUMS"
+    },
+    {
+      "name": "stage/sources/publisher-gitea-1.19.4-linux-amd64.sha256",
+      "bytes": 91,
+      "sha256": "20b3b909e6544ce5d64668b871ff08de4c39314567ea3fc7c5326755a801aaba",
+      "former_host_path": "@WORLD@/stage/sources/publisher-gitea-1.19.4-linux-amd64.sha256"
+    },
+    {
+      "name": "stage/sources/publisher-sha256sums.txt",
+      "bytes": 3519,
+      "sha256": "d48d3883d660bd93ff5b8134e0972d2055e00f62929c6331656d767c1e06a468",
+      "former_host_path": "@WORLD@/stage/sources/publisher-sha256sums.txt"
+    },
+    {
+      "name": "stage/sources/systemd_249.11-0ubuntu3.10.debian.tar.xz",
+      "bytes": 251360,
+      "sha256": "298e151cbb57172e1c5f1fb96cb077a680596a57741332327f2f5046dcc26e34",
+      "former_host_path": "@WORLD@/stage/sources/systemd_249.11-0ubuntu3.10.debian.tar.xz"
+    },
+    {
+      "name": "stage/sources/systemd_249.11-0ubuntu3.10.dsc",
+      "bytes": 5932,
+      "sha256": "19446e16f89e2195bc5a74cf928a475868cae14f3b75c4dcd65f6e2377fa8de7",
+      "former_host_path": "@WORLD@/stage/sources/systemd_249.11-0ubuntu3.10.dsc"
+    },
+    {
+      "name": "stage/sources/systemd_249.11.orig.tar.gz",
+      "bytes": 10622702,
+      "sha256": "305ba81cc33593bc2e8e9d6dc7f964b1c0a9303155fced5e6b1d236577441bf2",
+      "former_host_path": "@WORLD@/stage/sources/systemd_249.11.orig.tar.gz"
+    },
+    {
+      "name": "stage/scramp-1.4.4-py3-none-any.whl",
+      "bytes": 13120,
+      "sha256": "b142312df7c2977241d951318b7ee923d6b7a4f75ba0f05b621ece1ed616faa3",
+      "former_host_path": "@WORLD@/stage/scramp-1.4.4-py3-none-any.whl"
+    },
+    {
+      "name": "stage/six-1.16.0-py2.py3-none-any.whl",
+      "bytes": 11053,
+      "sha256": "8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254",
+      "former_host_path": "@WORLD@/stage/six-1.16.0-py2.py3-none-any.whl"
+    },
+    {
+      "name": "stage/systemd-10/RECEIPT.json",
+      "bytes": 4996,
+      "sha256": "b5d3fcd794f7f3c2c5624b40d9b03ef865bfe4a82087f3bfa0c911fbaf41a609",
+      "former_host_path": "@WORLD@/stage/systemd-10/RECEIPT.json"
+    },
+    {
+      "name": "stage/systemd-10/SHA256SUMS",
+      "bytes": 855,
+      "sha256": "d463f6c8faa58967ac873d6bd706c5616561fc0abacaa69273fd39af56aa7a93",
+      "former_host_path": "@WORLD@/stage/systemd-10/SHA256SUMS"
+    },
+    {
+      "name": "stage/systemd-10/libnss-systemd_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 132822,
+      "sha256": "cb7016c38ef07d3a26bafa0ec7dc7dd1016bffc9dad0ec7d6c283271ae7ffa0a",
+      "former_host_path": "@WORLD@/stage/systemd-10/libnss-systemd_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-10/libpam-systemd_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 202938,
+      "sha256": "866a3d4ec7212fdb6dd4d4f94b5d5eb7a0d83b4171bd8513e7189981e0e29319",
+      "former_host_path": "@WORLD@/stage/systemd-10/libpam-systemd_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-10/libsystemd0_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 318848,
+      "sha256": "97001f76f4dfb07b197e1a2bddd2a6a8174ae6403856dacbc13d4142dcac5059",
+      "former_host_path": "@WORLD@/stage/systemd-10/libsystemd0_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-10/libudev1_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 77998,
+      "sha256": "29dca2614703f04584bf09d289653091b423ba7f157cb8b3090e375db2c0af39",
+      "former_host_path": "@WORLD@/stage/systemd-10/libudev1_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-10/systemd-sysv_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 10460,
+      "sha256": "430d2e0e9035e224c1f430b6fbd79dfd1a244418c9e6cf6d24efc91ac90e79a5",
+      "former_host_path": "@WORLD@/stage/systemd-10/systemd-sysv_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-10/systemd-timesyncd_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 31190,
+      "sha256": "5943d3b687fef522781f5d251c9187860119b27fcd0840bcbb847e964ecd31ef",
+      "former_host_path": "@WORLD@/stage/systemd-10/systemd-timesyncd_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-10/systemd_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 4580932,
+      "sha256": "da5f04e569f583cf891eb8d73ea246a8e24387e57ee8cd06f071465b4315c7c5",
+      "former_host_path": "@WORLD@/stage/systemd-10/systemd_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-10/udev_249.11-0ubuntu3.10_amd64.deb",
+      "bytes": 1557190,
+      "sha256": "fc2c118a488641262b624908f4f3545388d037ccc665f440ec9114222a5a99da",
+      "former_host_path": "@WORLD@/stage/systemd-10/udev_249.11-0ubuntu3.10_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-pin/SHA256SUMS",
+      "bytes": 847,
+      "sha256": "316dbdd255a3876f1a31f0e8ae56ddafe03088e0611269712aeda165dae1f594",
+      "former_host_path": "@WORLD@/stage/systemd-pin/SHA256SUMS"
+    },
+    {
+      "name": "stage/systemd-pin/libnss-systemd_249.11-0ubuntu3.9_amd64.deb",
+      "bytes": 132802,
+      "sha256": "cd990cec3995307de88d00e133deecd0c9dacff956b097f6acffd9bd7e624a62",
+      "former_host_path": "@WORLD@/stage/systemd-pin/libnss-systemd_249.11-0ubuntu3.9_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-pin/libpam-systemd_249.11-0ubuntu3.9_amd64.deb",
+      "bytes": 202928,
+      "sha256": "4fd5fd7a0d599c10e93a930fa7987530f93f7bae8d0db9224aa2d7f4ed3d0484",
+      "former_host_path": "@WORLD@/stage/systemd-pin/libpam-systemd_249.11-0ubuntu3.9_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-pin/libsystemd0_249.11-0ubuntu3.9_amd64.deb",
+      "bytes": 317540,
+      "sha256": "454c7502a1fea43c0f5566f6a2c58a66a3dae9e14e12895e89a14faa90d062b8",
+      "former_host_path": "@WORLD@/stage/systemd-pin/libsystemd0_249.11-0ubuntu3.9_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-pin/libudev1_249.11-0ubuntu3.9_amd64.deb",
+      "bytes": 77142,
+      "sha256": "7286902436c071790d81fcbd52a0a7f7b3ad42e605c1247800d9348a84e599a7",
+      "former_host_path": "@WORLD@/stage/systemd-pin/libudev1_249.11-0ubuntu3.9_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-pin/systemd-sysv_249.11-0ubuntu3.9_amd64.deb",
+      "bytes": 10458,
+      "sha256": "e8ad455e0756b9155fdb3799a501c93fe25a0423ec6c75a0762d887787759c5e",
+      "former_host_path": "@WORLD@/stage/systemd-pin/systemd-sysv_249.11-0ubuntu3.9_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-pin/systemd-timesyncd_249.11-0ubuntu3.9_amd64.deb",
+      "bytes": 31176,
+      "sha256": "caa558167ed043c04f989ea8f3304229eed0640b89b167ebba80cc442e97c5df",
+      "former_host_path": "@WORLD@/stage/systemd-pin/systemd-timesyncd_249.11-0ubuntu3.9_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-pin/systemd_249.11-0ubuntu3.9_amd64.deb",
+      "bytes": 4580770,
+      "sha256": "daa0f52621234b1c2041233d2d03a83db29c3565f1b96dde15e31afa90b4091d",
+      "former_host_path": "@WORLD@/stage/systemd-pin/systemd_249.11-0ubuntu3.9_amd64.deb"
+    },
+    {
+      "name": "stage/systemd-pin/udev_249.11-0ubuntu3.9_amd64.deb",
+      "bytes": 1557128,
+      "sha256": "b2e2dff3eacb80fd2ee024ac220aef9250c74e7b06c7434e39091a76a9a10854",
+      "former_host_path": "@WORLD@/stage/systemd-pin/udev_249.11-0ubuntu3.9_amd64.deb"
+    },
+    {
+      "name": "stage/temurin-jdk-17.0.8_7/OpenJDK17U-jdk_x64_linux_hotspot_17.0.8_7.tar.gz",
+      "bytes": 192048931,
+      "sha256": "aa5fc7d388fe544e5d85902e68399d5299e931f9b280d358a3cbee218d6017b0",
+      "former_host_path": "@WORLD@/stage/temurin-jdk-17.0.8_7/OpenJDK17U-jdk_x64_linux_hotspot_17.0.8_7.tar.gz"
+    },
+    {
+      "name": "stage/temurin-jdk-17.0.8_7/RECEIPT.json",
+      "bytes": 668,
+      "sha256": "280a043420f5ba6101a446a7d5b2f1b26d585c30b0f8a209f08215469c5783a6",
+      "former_host_path": "@WORLD@/stage/temurin-jdk-17.0.8_7/RECEIPT.json"
+    },
+    {
+      "name": "stage/temurin-jdk-17.0.8_7/SHA256SUMS",
+      "bytes": 115,
+      "sha256": "a6a086a3d56600c0acfaa68d526cf158424ee09f4efd84a772b81619ba1ec484",
+      "former_host_path": "@WORLD@/stage/temurin-jdk-17.0.8_7/SHA256SUMS"
+    },
+    {
+      "name": "workloads/java-gateway/Gateway.java",
+      "bytes": 6506,
+      "sha256": "a5040f300d166f325113e7ad89a9b9c55500d918171c01f436febd93dc2100ab",
+      "former_host_path": "@WORLD@/workloads/java-gateway/Gateway.java"
+    },
+    {
+      "name": "workloads/java-gateway/GatewayKeyTest.java",
+      "bytes": 1278,
+      "sha256": "15f5c3c4cbd604ca0bbebf257c1c8fedeb141da50b587dfcae86cd7b163885c5",
+      "former_host_path": "@WORLD@/workloads/java-gateway/GatewayKeyTest.java"
+    },
+    {
+      "name": "workloads/writer.py",
+      "bytes": 4846,
+      "sha256": "41e1074b759fdc0772739f479b31c55bda17b13da51c2690d30e1c34f5218fbf",
+      "former_host_path": "@WORLD@/workloads/writer.py"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/blobs/sha256/2480b5e5b4799e21de8675b4bf45f9ed7d26c9a5e1d1b3b757f7b66c5d38400d",
+      "bytes": 4098,
+      "sha256": "2480b5e5b4799e21de8675b4bf45f9ed7d26c9a5e1d1b3b757f7b66c5d38400d",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/blobs/sha256/2480b5e5b4799e21de8675b4bf45f9ed7d26c9a5e1d1b3b757f7b66c5d38400d"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/blobs/sha256/2a3cbee5a333d777431ecd21204996df48ad3b55f4e8d302caf209fc38ffe816",
+      "bytes": 3632,
+      "sha256": "2a3cbee5a333d777431ecd21204996df48ad3b55f4e8d302caf209fc38ffe816",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/blobs/sha256/2a3cbee5a333d777431ecd21204996df48ad3b55f4e8d302caf209fc38ffe816"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/blobs/sha256/3227089d93fcc44c1513584429763ea15bbcf89df2ffab7836baf98e43a79a00",
+      "bytes": 123,
+      "sha256": "3227089d93fcc44c1513584429763ea15bbcf89df2ffab7836baf98e43a79a00",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/blobs/sha256/3227089d93fcc44c1513584429763ea15bbcf89df2ffab7836baf98e43a79a00"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/blobs/sha256/493d8e4cc61984cac7d48345eaf26953617cbcb20fd83db6ccc98e711bd246ed",
+      "bytes": 82509125,
+      "sha256": "493d8e4cc61984cac7d48345eaf26953617cbcb20fd83db6ccc98e711bd246ed",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/blobs/sha256/493d8e4cc61984cac7d48345eaf26953617cbcb20fd83db6ccc98e711bd246ed"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/blobs/sha256/4fb560c5ed42d4a79e201bd68bb0d41706cb47267bb777f783adc408ee57e518",
+      "bytes": 10749608,
+      "sha256": "4fb560c5ed42d4a79e201bd68bb0d41706cb47267bb777f783adc408ee57e518",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/blobs/sha256/4fb560c5ed42d4a79e201bd68bb0d41706cb47267bb777f783adc408ee57e518"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/blobs/sha256/5ae42fda1e0186801b580b01a0d97f79501f02b633896bb0e0b2d727cdcec0ab",
+      "bytes": 1684,
+      "sha256": "5ae42fda1e0186801b580b01a0d97f79501f02b633896bb0e0b2d727cdcec0ab",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/blobs/sha256/5ae42fda1e0186801b580b01a0d97f79501f02b633896bb0e0b2d727cdcec0ab"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/blobs/sha256/66e0211f27b7c5b0e006dbf7fa6cdb50a590badbb24863f0531f2ca9d4bef5e2",
+      "bytes": 7815874,
+      "sha256": "66e0211f27b7c5b0e006dbf7fa6cdb50a590badbb24863f0531f2ca9d4bef5e2",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/blobs/sha256/66e0211f27b7c5b0e006dbf7fa6cdb50a590badbb24863f0531f2ca9d4bef5e2"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/blobs/sha256/85708b11d45647c35b9288e0de0706d24a5ce8a378166cadc700f756cc1a38d6",
+      "bytes": 685,
+      "sha256": "85708b11d45647c35b9288e0de0706d24a5ce8a378166cadc700f756cc1a38d6",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/blobs/sha256/85708b11d45647c35b9288e0de0706d24a5ce8a378166cadc700f756cc1a38d6"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/blobs/sha256/bcb8b21e3a33a5135fe88afba977273aaefe2e83dc2b4435847b33287605d1d6",
+      "bytes": 73169972,
+      "sha256": "bcb8b21e3a33a5135fe88afba977273aaefe2e83dc2b4435847b33287605d1d6",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/blobs/sha256/bcb8b21e3a33a5135fe88afba977273aaefe2e83dc2b4435847b33287605d1d6"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/blobs/sha256/e4a99af5f3b4e07763fc961d3f8b14f93ee6256ad9082fdb9ca2fbfa79903a9d",
+      "bytes": 1238,
+      "sha256": "e4a99af5f3b4e07763fc961d3f8b14f93ee6256ad9082fdb9ca2fbfa79903a9d",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/blobs/sha256/e4a99af5f3b4e07763fc961d3f8b14f93ee6256ad9082fdb9ca2fbfa79903a9d"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/complete.json",
+      "bytes": 311,
+      "sha256": "af2880bfa80b274eedeaa73f279dff2e7889e72b0c17084981671c938051d2ce",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/complete.json"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/index.json",
+      "bytes": 451,
+      "sha256": "603d212ea915bb0fafcc70cd956c103899533a2e5ade97548dcebdf8befc7d70",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/index.json"
+    },
+    {
+      "name": "external-inputs/image-cache/cilium-1.13.2/oci-layout",
+      "bytes": 30,
+      "sha256": "18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6",
+      "former_host_path": "@WORLD@/external/image-cache/cilium-1.13.2/oci-layout"
+    },
+    {
+      "name": "external-inputs/image-cache/operator-generic-1.13.2/blobs/sha256/0784ce2d559eec8994b96cee13f5c6253a0fdb14eb9d1038672f479e65d5e7ae",
+      "bytes": 1095,
+      "sha256": "0784ce2d559eec8994b96cee13f5c6253a0fdb14eb9d1038672f479e65d5e7ae",
+      "former_host_path": "@WORLD@/external/image-cache/operator-generic-1.13.2/blobs/sha256/0784ce2d559eec8994b96cee13f5c6253a0fdb14eb9d1038672f479e65d5e7ae"
+    },
+    {
+      "name": "external-inputs/image-cache/operator-generic-1.13.2/blobs/sha256/300204211c425bdcbf6c798812aa077457fa134c8e120145e6d339572480121b",
+      "bytes": 20169074,
+      "sha256": "300204211c425bdcbf6c798812aa077457fa134c8e120145e6d339572480121b",
+      "former_host_path": "@WORLD@/external/image-cache/operator-generic-1.13.2/blobs/sha256/300204211c425bdcbf6c798812aa077457fa134c8e120145e6d339572480121b"
+    },
+    {
+      "name": "external-inputs/image-cache/operator-generic-1.13.2/blobs/sha256/5e08056ff59562dae8944b1e2a3d830b4f5984aae3cafc5bc678af4e3e4cba69",
+      "bytes": 2980,
+      "sha256": "5e08056ff59562dae8944b1e2a3d830b4f5984aae3cafc5bc678af4e3e4cba69",
+      "former_host_path": "@WORLD@/external/image-cache/operator-generic-1.13.2/blobs/sha256/5e08056ff59562dae8944b1e2a3d830b4f5984aae3cafc5bc678af4e3e4cba69"
+    },
+    {
+      "name": "external-inputs/image-cache/operator-generic-1.13.2/blobs/sha256/799cc80b95d7c991981ddb4d67d1195fbb60f32f19c5f41095d6ce407f610343",
+      "bytes": 123546,
+      "sha256": "799cc80b95d7c991981ddb4d67d1195fbb60f32f19c5f41095d6ce407f610343",
+      "former_host_path": "@WORLD@/external/image-cache/operator-generic-1.13.2/blobs/sha256/799cc80b95d7c991981ddb4d67d1195fbb60f32f19c5f41095d6ce407f610343"
+    },
+    {
+      "name": "external-inputs/image-cache/operator-generic-1.13.2/blobs/sha256/9ab3b5350356335422ba2bdb2268b4e094db9ed356aff100df239ed68e004600",
+      "bytes": 1846088,
+      "sha256": "9ab3b5350356335422ba2bdb2268b4e094db9ed356aff100df239ed68e004600",
+      "former_host_path": "@WORLD@/external/image-cache/operator-generic-1.13.2/blobs/sha256/9ab3b5350356335422ba2bdb2268b4e094db9ed356aff100df239ed68e004600"
+    },
+    {
+      "name": "external-inputs/image-cache/operator-generic-1.13.2/blobs/sha256/a1982c0a22297aaac3563e428c330e17668305a41865a842dec53d241c5490ab",
+      "bytes": 685,
+      "sha256": "a1982c0a22297aaac3563e428c330e17668305a41865a842dec53d241c5490ab",
+      "former_host_path": "@WORLD@/external/image-cache/operator-generic-1.13.2/blobs/sha256/a1982c0a22297aaac3563e428c330e17668305a41865a842dec53d241c5490ab"
+    },
+    {
+      "name": "external-inputs/image-cache/operator-generic-1.13.2/blobs/sha256/f9b5f91c40242fa0e1152c42d5f3588741372d0e0047321d3b5497b6d0262ef9",
+      "bytes": 61862,
+      "sha256": "f9b5f91c40242fa0e1152c42d5f3588741372d0e0047321d3b5497b6d0262ef9",
+      "former_host_path": "@WORLD@/external/image-cache/operator-generic-1.13.2/blobs/sha256/f9b5f91c40242fa0e1152c42d5f3588741372d0e0047321d3b5497b6d0262ef9"
+    },
+    {
+      "name": "external-inputs/image-cache/operator-generic-1.13.2/complete.json",
+      "bytes": 321,
+      "sha256": "712c3e06d401098d5282394f36e71627b6f7e65abb6669594745329f42c30a53",
+      "former_host_path": "@WORLD@/external/image-cache/operator-generic-1.13.2/complete.json"
+    },
+    {
+      "name": "external-inputs/image-cache/operator-generic-1.13.2/index.json",
+      "bytes": 461,
+      "sha256": "dc0a6bd8b7141bd65ac59900d538422330300ed4ec29eb4b4b4f21e9314e7618",
+      "former_host_path": "@WORLD@/external/image-cache/operator-generic-1.13.2/index.json"
+    },
+    {
+      "name": "external-inputs/image-cache/operator-generic-1.13.2/oci-layout",
+      "bytes": 30,
+      "sha256": "18f0797eab35a4597c1e9624aa4f15fd91f6254e5538c1e0d193b2a95dd4acc6",
+      "former_host_path": "@WORLD@/external/image-cache/operator-generic-1.13.2/oci-layout"
+    },
+    {
+      "name": "external-inputs/tools/crane",
+      "bytes": 11870370,
+      "sha256": "8e75c326adb43b053cfd78b9b987663f8f4fe4557f4d3915905643f25c730992",
+      "former_host_path": "@WORLD@/external/tools/crane"
+    },
+    {
+      "name": "external-inputs/tools/go-containerregistry-v0.22.1.tar.gz",
+      "bytes": 16496784,
+      "sha256": "0ab7a1d6932a213aed964ce97666c3077fe691c8606413674a8b3e0b9ec4cda0",
+      "former_host_path": "@WORLD@/external/tools/go-containerregistry-v0.22.1.tar.gz"
+    }
+  ],
+  "active": true,
+  "artifact_subdir": "build",
+  "disk_subdir": "build",
+  "single_fabric": false,
+  "construction_phase": "ordinary-installation",
+  "known_hosts_prefix": "build-",
+  "fronts": {
+    "us-parent-01": "@WORLD@/vm/build/us-parent-01.qcow2",
+    "us-work-01": "@WORLD@/vm/build/us-work-01.qcow2",
+    "us-work-02": "@WORLD@/vm/build/us-work-02.qcow2",
+    "us-work-03": "@WORLD@/vm/build/us-work-03.qcow2",
+    "eu-parent-01": "@WORLD@/vm/build/eu-parent-01.qcow2",
+    "eu-work-01": "@WORLD@/vm/build/eu-work-01.qcow2",
+    "eu-work-02": "@WORLD@/vm/build/eu-work-02.qcow2",
+    "eu-work-03": "@WORLD@/vm/build/eu-work-03.qcow2"
+  },
+  "private_client_disk": "@WORLD@/vm/build/ops-helper-01.qcow2",
+  "seeds": {},
+  "seed_dirs": {
+    "us-parent-01": "@WORLD@/vm/build/seed/us-parent-01",
+    "us-work-01": "@WORLD@/vm/build/seed/us-work-01",
+    "us-work-02": "@WORLD@/vm/build/seed/us-work-02",
+    "us-work-03": "@WORLD@/vm/build/seed/us-work-03",
+    "eu-parent-01": "@WORLD@/vm/build/seed/eu-parent-01",
+    "eu-work-01": "@WORLD@/vm/build/seed/eu-work-01",
+    "eu-work-02": "@WORLD@/vm/build/seed/eu-work-02",
+    "eu-work-03": "@WORLD@/vm/build/seed/eu-work-03",
+    "ops-helper-01": "@WORLD@/vm/build/seed/ops-helper-01",
+    "install-image-01": "@WORLD@/vm/build/seed/install-image-01",
+    "recovery-01": "@WORLD@/vm/build/seed/recovery-01",
+    "us-work-04": "@WORLD@/vm/build/seed/us-work-04",
+    "eu-work-04": "@WORLD@/vm/build/seed/eu-work-04",
+    "eu-work-05": "@WORLD@/vm/build/seed/eu-work-05",
+    "us-parent-01-rescue": "@WORLD@/vm/build/seed/us-parent-01-rescue",
+    "us-work-01-rescue": "@WORLD@/vm/build/seed/us-work-01-rescue",
+    "us-work-02-rescue": "@WORLD@/vm/build/seed/us-work-02-rescue",
+    "us-work-03-rescue": "@WORLD@/vm/build/seed/us-work-03-rescue",
+    "eu-parent-01-rescue": "@WORLD@/vm/build/seed/eu-parent-01-rescue",
+    "eu-work-01-rescue": "@WORLD@/vm/build/seed/eu-work-01-rescue",
+    "eu-work-02-rescue": "@WORLD@/vm/build/seed/eu-work-02-rescue",
+    "eu-work-03-rescue": "@WORLD@/vm/build/seed/eu-work-03-rescue",
+    "install-image-01-rescue": "@WORLD@/vm/build/seed/install-image-01-rescue",
+    "recovery-01-rescue": "@WORLD@/vm/build/seed/recovery-01-rescue",
+    "us-work-04-rescue": "@WORLD@/vm/build/seed/us-work-04-rescue",
+    "eu-work-04-rescue": "@WORLD@/vm/build/seed/eu-work-04-rescue",
+    "eu-work-05-rescue": "@WORLD@/vm/build/seed/eu-work-05-rescue"
+  },
+  "seed_service_root": "@WORLD@/vm/build/seed",
+  "construction_seed_names": [
+    "install-image-01"
+  ]
+}

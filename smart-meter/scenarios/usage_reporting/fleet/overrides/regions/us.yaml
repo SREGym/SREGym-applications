@@ -1,0 +1,3 @@
+generations:
+  g-elastic:
+    capacity: {cluster_eligible: true}

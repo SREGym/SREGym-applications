@@ -1,0 +1,30 @@
+{
+  "index": {
+    "snapshot": "20230918T000000Z",
+    "inrelease_sha256": "c0838f35f040e64cecdef01242184184311dbc5991767a091a01e0af7fe96077",
+    "packages_xz_sha256": "451e89021923caf500b5476ed7c96113ef156b65d66d1aed4b286939fa695f53",
+    "signature": "VALIDSIG, Ubuntu archive keyring"
+  },
+  "files": [
+    {
+      "package": "netplan.io",
+      "version": "0.105-0ubuntu2~22.04.3",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20230918T000000Z/pool/main/n/netplan.io/netplan.io_0.105-0ubuntu2~22.04.3_amd64.deb",
+      "bytes": 92940,
+      "sha256": "43f222cfdbf5369a70904476268ae36a3bf9670cf1efaaf34321bbeb595b29d1",
+      "depends": "libc6 (>= 2.34), libglib2.0-0 (>= 2.70.0), libnetplan0 (= 0.105-0ubuntu2~22.04.3), libsystemd0 (>= 243), iproute2, python3, python3-yaml, python3-netifaces, systemd (>= 248~)",
+      "pre_depends": "",
+      "retrieved_at_utc": "2026-10-24T00:35:35.501975+00:00"
+    },
+    {
+      "package": "libnetplan0",
+      "version": "0.105-0ubuntu2~22.04.3",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20230918T000000Z/pool/main/n/netplan.io/libnetplan0_0.105-0ubuntu2~22.04.3_amd64.deb",
+      "bytes": 102686,
+      "sha256": "8c50fef6a5effb9f99eaacffa6ca356bc48029f19f2d4f086b4f6161fde994f6",
+      "depends": "libc6 (>= 2.27), libglib2.0-0 (>= 2.70.0), libuuid1 (>= 2.16), libyaml-0-2",
+      "pre_depends": "",
+      "retrieved_at_utc": "2026-10-24T00:35:35.502198+00:00"
+    }
+  ]
+}

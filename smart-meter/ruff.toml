@@ -1,0 +1,27 @@
+# SREGym's ruff settings (pyproject.toml), plus what Smart Meter's guest code needs.
+line-length = 120
+target-version = "py312"
+extend-include = ["world/companyctl"]
+
+# Guest code runs on the guests' Python 3.10 (Ubuntu 22.04), so pyupgrade and
+# the formatter must not use anything newer there.
+[per-file-target-version]
+"scenarios/usage_reporting/{artifact_audit,bootstrap,build_image_defaults,customer_activity,install_audit,maintain,mqtt_router,mqtt_view,package,publish_reporting_profiles,rollout,schedule,wireguard_link}.py" = "py310"
+"scenarios/usage_reporting/fleet/*.py" = "py310"
+"world/company_{backfill,fleet,health_activity,host_metrics,mqtt_latest,reporting,segment_stream,telemetry_io}.py" = "py310"
+"world/{companyctl,sim.py}" = "py310"
+"world/{maintenance,workloads}/**/*.py" = "py310"
+
+[lint]
+select = ["E", "F", "UP", "B", "SIM", "I"]
+ignore = ["E501", "B008", "SIM102"]
+
+[lint.per-file-ignores]
+# These scripts set sys.path or the environment before importing world modules.
+"scenarios/usage_reporting/{build_context,capacity_test,cluster_install,initialize}.py" = ["E402"]
+"world/{revive,test_agent_endpoints,workloads_eu,world_region}.py" = ["E402"]
+"grader/freeze.py" = ["E402"]
+
+[format]
+quote-style = "double"
+docstring-code-format = true

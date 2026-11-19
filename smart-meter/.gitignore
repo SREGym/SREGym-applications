@@ -1,0 +1,15 @@
+world/vm/
+world/artifacts/
+world/stage/
+world/images/
+world/base/
+world/external/
+world/world-config.json
+world/world-clock.json
+world/public-instances.json
+world/STATE.md
+grader/results/
+__pycache__/
+STATUS.log
+.sregym-world.lock
+.ruff_cache/

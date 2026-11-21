@@ -1,5 +1,8 @@
 name: user-service
 
+# Derives its machine ID from eth0's MAC address; see global.fixedMacAddress.
+readsMacAddress: true
+
 ports:
   - port: 9090
     targetPort: 9090

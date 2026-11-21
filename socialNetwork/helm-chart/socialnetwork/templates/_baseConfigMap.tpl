@@ -11,5 +11,8 @@ data:
   {{ $configMap.name -}}: |
 {{- tpl ($.Files.Get $filePath) $ | indent 4 -}}
   {{- end }} 
+  {{- if and .Values.readsMacAddress .Values.global.fixedMacAddress }}
+  mac-address: {{ .Values.global.fixedMacAddress | quote }}
+  {{- end }}
 
 {{- end }}

@@ -59,6 +59,12 @@ spec:
           mountPath: {{ $configMap.mountPath }}
           subPath: {{ $configMap.name }}
         {{- end }}
+        {{- if and $.Values.readsMacAddress $.Values.global.fixedMacAddress }}
+        - name: {{ $.Values.name }}-config
+          mountPath: /sys/class/net/eth0/address
+          subPath: mac-address
+          readOnly: true
+        {{- end }}
         {{- if $.Values.volumes }}
         - name: tls-cert
           mountPath: /etc/tls
